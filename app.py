@@ -1,10 +1,14 @@
 import dearpygui.dearpygui as dpg
-import youtube_dl
+from youtube_dl import YoutubeDL
 
 
 def convert_video():
     url_input = dpg.get_value('url_input')
-    print(url_input)
+
+    with YoutubeDL({'F': True}) as ydl:
+        info = ydl.extract_info(url_input, download=False)
+
+    print(info)
 
 
 dpg.create_context()
