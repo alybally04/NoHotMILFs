@@ -2,20 +2,24 @@ import dearpygui.dearpygui as dpg
 import youtube_dl
 
 
-def save_callback():
-    print("Save Clicked")
+def convert_video():
+    url_input = dpg.get_value('url_input')
+    print(url_input)
 
 
 dpg.create_context()
-dpg.create_viewport(width=500, height=500)
+
+with dpg.window(tag='main'):
+    dpg.add_text("Please enter a YouTube URL")
+    dpg.add_input_text(label="URL", tag='url_input', no_spaces=True)
+    dpg.add_button(label="Save", callback=convert_video)
+
+dpg.create_viewport(title='NoHotMILFs', width=500, height=500)
 dpg.setup_dearpygui()
 
-with dpg.window(label="Example Window"):
-    dpg.add_text("Hello world")
-    dpg.add_button(label="Save", callback=save_callback)
-    dpg.add_input_text(label="string")
-    dpg.add_slider_float(label="float")
-
 dpg.show_viewport()
+# Bool value means whether it should be true or false that this is the main window
+dpg.set_primary_window("main", True)
+
 dpg.start_dearpygui()
 dpg.destroy_context()
