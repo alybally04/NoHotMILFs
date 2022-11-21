@@ -73,7 +73,7 @@ def download_video(sender, app_data, user_data):
     url = user_data[0]
     format_id = user_data[1]
 
-    with YoutubeDL({'cachedir': False, 'format': format_id, 'headers': "Accept-Encoding:gzip, deflate"}) as ydl:
+    with YoutubeDL({'cachedir': False, 'format': f'{format_id}+bestaudio[ext=m4a]', 'merge_output_format': 'mp4'}) as ydl:
         ydl.download(url)
 
 
