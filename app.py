@@ -38,6 +38,12 @@ def convert_video():
         video_data = ydl.extract_info(url_input, download=False)
         print(video_data)
 
+    def download_video(user_data):
+        print(user_data)
+        print('nigga')
+        with YoutubeDL({'format': user_data}) as ydl:
+            ydl.extract_info(url_input)
+
     dpg.delete_item('loading_indicator')
     with dpg.table(tag='formats_table', parent='main', row_background=True):
 
@@ -63,6 +69,9 @@ def convert_video():
                         dpg.add_text(video_format['format_note'])
 
                     dpg.add_text(filesize_readable(video_format['filesize']))
+
+                    print(video_format['format_id'])
+                    dpg.add_button(label='Download', callback=download_video, user_data=video_format['format_id'])
 
 
 with dpg.window(tag='main'):
