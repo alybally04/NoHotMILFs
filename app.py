@@ -1,28 +1,25 @@
 import dearpygui.dearpygui as dpg
-from youtube_dl import YoutubeDL
+from yt_dlp import YoutubeDL
 
 dpg.create_context()
 
 
 # Convert bits into Human-readable format
-def filesize_readable(bits):
-    if bits < 1000:  # bits
+def filesize_readable(number_of_bytes):
+    if number_of_bytes < 1024:  # bytes
         units = 'bytes'
-    elif bits < 1000000:  # kilobits
-        bits /= 1000
+    elif number_of_bytes < 1048576:  # kilobytes
+        number_of_bytes /= 1024
         units = 'KB'
-    elif bits < 1000000000:  # megabits
-        bits /= 1000000
+    elif number_of_bytes < 1073741824:  # megabytes
+        number_of_bytes /= 1048576
         units = 'MB'
-    else:  # gigabits
-        bits /= 1000000000
+    else:  # gigabytes
+        number_of_bytes /= 1073741824
         units = 'GB'
 
-    # Convert from bits to bytes
-    bits /= 8
-
     # Format the output
-    formatted_string = f'{round(bits, 1)} {units}'
+    formatted_string = f'{round(number_of_bytes, 1)} {units}'
 
     return formatted_string
 
@@ -34,15 +31,9 @@ def convert_video():
     dpg.add_loading_indicator(tag='loading_indicator', parent='main')
     url_input = dpg.get_value('url_input')
 
-    with YoutubeDL({}) as ydl:
+    with YoutubeDL({'cachedir': False}) as ydl:
         video_data = ydl.extract_info(url_input, download=False)
         print(video_data)
-
-    def download_video(user_data):
-        print(user_data)
-        print('nigga')
-        with YoutubeDL({'format': user_data}) as ydl:
-            ydl.extract_info(url_input)
 
     dpg.delete_item('loading_indicator')
     with dpg.table(tag='formats_table', parent='main', row_background=True):
@@ -57,21 +48,30 @@ def convert_video():
 
         # Parse available formats
         for video_format in video_data['formats']:
-            if video_format['ext'] != 'webm' and video_format['filesize'] is not None:
+            # Filter out webm and invalid files
+            if video_format['ext'] != 'webm' and 'filesize' in video_format and video_format['filesize'] is not None:
                 with dpg.table_row():
                     # Do not list webm format type
                     dpg.add_text(video_format['ext'])
 
-                    if video_format['format_note'] == 'tiny':
-                        # Audio files are referred to as tiny for some reason
-                        dpg.add_text('Audio only')
-                    else:
+                    # Returns True if any numbers in string
+                    if any(char.isdigit() for char in video_format['format_note']):
                         dpg.add_text(video_format['format_note'])
+                    else:
+                        # Audio files are referred to by quality
+                        dpg.add_text(f"Audio only - {video_format['format_note']}")
 
                     dpg.add_text(filesize_readable(video_format['filesize']))
 
-                    print(video_format['format_id'])
-                    dpg.add_button(label='Download', callback=download_video, user_data=video_format['format_id'])
+                    dpg.add_button(label='Download', callback=download_video, user_data=[url_input, video_format['format_id']])
+
+
+def download_video(sender, app_data, user_data):
+    url = user_data[0]
+    format_id = user_data[1]
+
+    with YoutubeDL({'cachedir': False, 'format': format_id}) as ydl:
+        ydl.download(url)
 
 
 with dpg.window(tag='main'):
@@ -79,7 +79,7 @@ with dpg.window(tag='main'):
     dpg.add_input_text(label="URL", tag='url_input', no_spaces=True)
     dpg.add_button(label="Convert Video", callback=convert_video)
 
-dpg.create_viewport(title='NoHotMILFs', width=400, height=500)
+dpg.create_viewport(title='NoHotMILFs', width=800, height=500)
 dpg.setup_dearpygui()
 
 dpg.show_viewport()
