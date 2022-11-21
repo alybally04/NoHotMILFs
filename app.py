@@ -1,3 +1,6 @@
+import os
+import shutil
+import requests
 import dearpygui.dearpygui as dpg
 from yt_dlp import YoutubeDL
 
@@ -27,20 +30,34 @@ def filesize_readable(number_of_bytes):
 def convert_video():
     if dpg.does_alias_exist('formats_table'):
         dpg.delete_item('formats_table')
+    if dpg.does_alias_exist('thumbnail'):
+        dpg.delete_item('thumbnail')
+        dpg.delete_item('thumbnail_png')
+    if dpg.does_alias_exist('video_title'):
+        dpg.delete_item('video_title')
 
     dpg.add_loading_indicator(tag='loading_indicator', parent='main')
     url_input = dpg.get_value('url_input')
 
     with YoutubeDL({'cachedir': False}) as ydl:
         video_data = ydl.extract_info(url_input, download=False)
-        print(video_data)
+
+    thumbnail_file = requests.get(video_data['thumbnail'], stream=True)
+    with open('thumbnail.png', 'wb') as video_thumbnail:
+        shutil.copyfileobj(thumbnail_file.raw, video_thumbnail)
+
+    width, height, channels, data = dpg.load_image('thumbnail.png')
+    with dpg.texture_registry():
+        dpg.add_static_texture(width=width, height=height, default_value=data, tag="thumbnail_png")
+
+    os.remove('thumbnail.png')
 
     dpg.delete_item('loading_indicator')
-    with dpg.table(tag='formats_table', parent='main', row_background=True):
+    dpg.add_image('thumbnail_png', tag='thumbnail', parent='main', width=160, height=90)
+    dpg.add_text(video_data['title'], tag='video_title', parent='main')
 
-        # use add_table_column to add columns to the table,
-        # table columns use child slot 0
-        # by default the tag is used as label unless specified otherwise
+    with dpg.table(tag='formats_table', parent='main', row_background=True):
+        # Adding columns to table
         dpg.add_table_column(label='Format')
         dpg.add_table_column(label='Quality')
         dpg.add_table_column(label='Size')
@@ -48,10 +65,9 @@ def convert_video():
 
         # Parse available formats
         for video_format in video_data['formats']:
-            # Filter out webm and invalid files
+            # Filter out invalid formats
             if video_format['ext'] != 'mhtml':
                 with dpg.table_row():
-                    # Do not list webm format type
                     dpg.add_text(video_format['ext'])
 
                     # Returns True if any numbers in string
@@ -75,6 +91,9 @@ def download_video(sender, app_data, user_data):
 
     with YoutubeDL({'cachedir': False, 'format': f'{format_id}+bestaudio[ext=m4a]', 'merge_output_format': 'mp4'}) as ydl:
         ydl.download(url)
+
+    dpg.delete_item('formats_table')
+    dpg.add_loading_indicator(tag='loading_indicator', parent='main')
 
 
 with dpg.window(tag='main'):
