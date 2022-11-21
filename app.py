@@ -49,7 +49,7 @@ def convert_video():
         # Parse available formats
         for video_format in video_data['formats']:
             # Filter out webm and invalid files
-            if video_format['ext'] != 'webm' and 'filesize' in video_format and video_format['filesize'] is not None:
+            if video_format['ext'] != 'mhtml':
                 with dpg.table_row():
                     # Do not list webm format type
                     dpg.add_text(video_format['ext'])
@@ -61,7 +61,10 @@ def convert_video():
                         # Audio files are referred to by quality
                         dpg.add_text(f"Audio only - {video_format['format_note']}")
 
-                    dpg.add_text(filesize_readable(video_format['filesize']))
+                    if 'filesize' in video_format and type(video_format['filesize']) is int:
+                        dpg.add_text(filesize_readable(video_format['filesize']))
+                    else:
+                        dpg.add_text('UNAVAILABLE')
 
                     dpg.add_button(label='Download', callback=download_video, user_data=[url_input, video_format['format_id']])
 
@@ -70,7 +73,7 @@ def download_video(sender, app_data, user_data):
     url = user_data[0]
     format_id = user_data[1]
 
-    with YoutubeDL({'cachedir': False, 'format': format_id}) as ydl:
+    with YoutubeDL({'cachedir': False, 'format': format_id, 'headers': "Accept-Encoding:gzip, deflate"}) as ydl:
         ydl.download(url)
 
 
