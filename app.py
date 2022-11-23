@@ -28,13 +28,11 @@ def filesize_readable(number_of_bytes):
 
 
 def convert_video():
-    if dpg.does_alias_exist('formats_table'):
-        dpg.delete_item('formats_table')
-    if dpg.does_alias_exist('thumbnail'):
-        dpg.delete_item('thumbnail')
-        dpg.delete_item('thumbnail_png')
-    if dpg.does_alias_exist('video_title'):
-        dpg.delete_item('video_title')
+    items = ['formats_table', 'thumbnail', 'thumbnail_png', 'img_unavailable', 'video_title', 'download_complete',
+             'progress_bar']
+    for item in items:
+        if dpg.does_alias_exist(item):
+            dpg.delete_item(item)
 
     dpg.add_loading_indicator(tag='loading_indicator', parent='main')
     url_input = dpg.get_value('url_input')
@@ -46,14 +44,19 @@ def convert_video():
     with open('thumbnail.png', 'wb') as video_thumbnail:
         shutil.copyfileobj(thumbnail_file.raw, video_thumbnail)
 
-    width, height, channels, data = dpg.load_image('thumbnail.png')
-    with dpg.texture_registry():
-        dpg.add_static_texture(width=width, height=height, default_value=data, tag="thumbnail_png")
+    try:
+        width, height, channels, data = dpg.load_image('thumbnail.png')
+
+        with dpg.texture_registry():
+            dpg.add_static_texture(width=width, height=height, default_value=data, tag="thumbnail_png")
+
+        dpg.add_image('thumbnail_png', tag='thumbnail', parent='main', width=240, height=135)
+    except TypeError:  # load_image returns none if error occurs
+        dpg.add_text('IMAGE UNAVAILABLE', tag='img_unavailable', parent='main', color=[255, 0, 0])
 
     os.remove('thumbnail.png')
 
     dpg.delete_item('loading_indicator')
-    dpg.add_image('thumbnail_png', tag='thumbnail', parent='main', width=160, height=90)
     dpg.add_text(video_data['title'], tag='video_title', parent='main')
 
     with dpg.table(tag='formats_table', parent='main', row_background=True):
@@ -89,11 +92,23 @@ def download_video(sender, app_data, user_data):
     url = user_data[0]
     format_id = user_data[1]
 
-    with YoutubeDL({'cachedir': False, 'format': f'{format_id}+bestaudio[ext=m4a]', 'merge_output_format': 'mp4'}) as ydl:
+    dpg.hide_item('formats_table')
+    dpg.add_text(f"ETA UNKNOWN", tag='eta', parent='main')
+    dpg.add_progress_bar(tag='progress_bar', parent='main')
+
+    def progress_hook(response):
+        if response['status'] == 'downloading':
+            print(f"nigga + {response['eta']}")
+
+        elif response["status"] == "finished":
+            file_name = response["filename"]
+
+    with YoutubeDL({'cachedir': False, 'progress_hooks': [progress_hook], 'format': f'{format_id}+bestaudio[ext=m4a]', 'merge_output_format': 'mp4'}) as ydl:
         ydl.download(url)
 
-    dpg.delete_item('formats_table')
-    dpg.add_loading_indicator(tag='loading_indicator', parent='main')
+    dpg.delete_item('eta')
+    dpg.delete_item('progress_bar')
+    dpg.show_item('formats_table')
 
 
 with dpg.window(tag='main'):
