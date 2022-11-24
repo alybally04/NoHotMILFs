@@ -27,6 +27,11 @@ def filesize_readable(number_of_bytes):
     return formatted_string
 
 
+# Formats ETA of video download from seconds remaining
+def eta_time_readable():
+    pass
+
+
 def convert_video():
     items = ['formats_table', 'thumbnail', 'thumbnail_png', 'img_unavailable', 'video_title', 'download_complete',
              'progress_bar']
@@ -37,7 +42,7 @@ def convert_video():
     dpg.add_loading_indicator(tag='loading_indicator', parent='main')
     url_input = dpg.get_value('url_input')
 
-    with YoutubeDL({'cachedir': False}) as ydl:
+    with YoutubeDL({'quiet': True, 'noplaylist': True, 'cachedir': False}) as ydl:
         video_data = ydl.extract_info(url_input, download=False)
 
     thumbnail_file = requests.get(video_data['thumbnail'], stream=True)
@@ -64,24 +69,43 @@ def convert_video():
         dpg.add_table_column(label='Format')
         dpg.add_table_column(label='Quality')
         dpg.add_table_column(label='Size')
-        dpg.add_table_column(enabled=False)
+        dpg.add_table_column()
 
+        bestaudio_size = 0
         # Parse available formats
         for video_format in video_data['formats']:
             # Filter out invalid formats
             if video_format['ext'] != 'mhtml':
                 with dpg.table_row():
+                    # Returns True if any numbers in string (There are no numbers in audio format names)
+                    if any(char.isdigit() for char in video_format['format_note']):
+                        format_type = 'video'
+                    else:
+                        format_type = 'audio'
+
+                    # Adding format name
                     dpg.add_text(video_format['ext'])
 
-                    # Returns True if any numbers in string
-                    if any(char.isdigit() for char in video_format['format_note']):
+                    if format_type == 'video':
                         dpg.add_text(video_format['format_note'])
+
                     else:
-                        # Audio files are referred to by quality
                         dpg.add_text(f"Audio only - {video_format['format_note']}")
 
                     if 'filesize' in video_format and type(video_format['filesize']) is int:
-                        dpg.add_text(filesize_readable(video_format['filesize']))
+                        if format_type == 'video':
+                            # Add size of audio file that will be added to video file during download to total size
+                            total_size = video_format['filesize'] + bestaudio_size
+                            file_size = filesize_readable(total_size)
+
+                        else:
+                            # Last audio item to save this will be used for combination
+                            # with video if video file is downloaded
+                            bestaudio_size = video_format['filesize']
+                            file_size = filesize_readable(video_format['filesize'])
+
+                        dpg.add_text(file_size)
+
                     else:
                         dpg.add_text('UNAVAILABLE')
 
@@ -98,12 +122,16 @@ def download_video(sender, app_data, user_data):
 
     def progress_hook(response):
         if response['status'] == 'downloading':
-            print(f"nigga + {response['eta']}")
+            downloaded_percent = (response["downloaded_bytes"]*100) // response["total_bytes"]
+            downloaded_percent /= 100
+
+            dpg.set_value("eta", response['eta'])
+            dpg.set_value("progress_bar", downloaded_percent)
 
         elif response["status"] == "finished":
             file_name = response["filename"]
 
-    with YoutubeDL({'cachedir': False, 'progress_hooks': [progress_hook], 'format': f'{format_id}+bestaudio[ext=m4a]', 'merge_output_format': 'mp4'}) as ydl:
+    with YoutubeDL({'quiet': True, 'noplaylist': True, 'cachedir': False, 'progress_hooks': [progress_hook], 'format': f'{format_id}+bestaudio[ext=m4a]', 'merge_output_format': 'mp4'}) as ydl:
         ydl.download(url)
 
     dpg.delete_item('eta')
@@ -122,6 +150,7 @@ dpg.setup_dearpygui()
 dpg.show_viewport()
 # Bool value means whether it should be true or false that this is the main window
 dpg.set_primary_window("main", True)
+dpg.set_viewport_vsync(True)
 
 dpg.start_dearpygui()
 dpg.destroy_context()
