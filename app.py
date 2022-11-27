@@ -2,6 +2,7 @@ import os
 import shutil
 import requests
 import dearpygui.dearpygui as dpg
+import yt_dlp.utils
 from yt_dlp import YoutubeDL
 
 dpg.create_context()
@@ -56,16 +57,24 @@ def eta_time_readable(seconds):
 
 
 def convert_video():
-    items = ['formats_table', 'thumbnail', 'thumbnail_png', 'img_unavailable', 'video_title', 'download_complete']
-    for item in items:
-        if dpg.does_alias_exist(item):
-            dpg.delete_item(item)
+    dpg.configure_item('convert_video', enabled=False)
+    dpg.configure_item('clear_all', enabled=False)
+
+    clear_result(None)
 
     dpg.add_loading_indicator(tag='loading_indicator', parent='main')
     url_input = dpg.get_value('url_input')
 
-    with YoutubeDL({'quiet': True, 'noplaylist': True, 'cachedir': False}) as ydl:
-        video_data = ydl.extract_info(url_input, download=False)
+    try:
+        with YoutubeDL({'quiet': True, 'noplaylist': True, 'cachedir': False}) as ydl:
+            video_data = ydl.extract_info(url_input, download=False)
+    except yt_dlp.utils.DownloadError:
+        dpg.add_text('ERROR CONVERTING VIDEO - Check the URL is correct and try again', tag='conversion_error', parent='main', color=[255, 0, 0])
+        dpg.delete_item('loading_indicator')
+        dpg.configure_item('convert_video', enabled=True)
+        dpg.configure_item('clear_all', enabled=True)
+
+        return
 
     thumbnail_file = requests.get(video_data['thumbnail'], stream=True)
     with open('thumbnail.png', 'wb') as video_thumbnail:
@@ -133,6 +142,9 @@ def convert_video():
 
                     dpg.add_button(label='Download', callback=download_video, user_data=[url_input, video_format['format_id']])
 
+    dpg.configure_item('convert_video', enabled=True)
+    dpg.configure_item('clear_all', enabled=True)
+
 
 def download_video(sender, app_data, user_data):
     url = user_data[0]
@@ -164,10 +176,25 @@ def download_video(sender, app_data, user_data):
     dpg.show_item('formats_table')
 
 
+# Clears output from converting a video
+def clear_result(sender):
+    if sender == 'clear_result':
+        dpg.set_value('url_input', value='')
+
+    items = ['formats_table', 'thumbnail', 'thumbnail_png', 'img_unavailable', 'video_title', 'download_complete',
+             'conversion_error']
+    for item in items:
+        if dpg.does_alias_exist(item):
+            dpg.delete_item(item)
+
+
 with dpg.window(tag='main'):
     dpg.add_text("Please enter a YouTube URL")
     dpg.add_input_text(label="URL", tag='url_input', no_spaces=True)
-    dpg.add_button(label="Convert Video", callback=convert_video)
+
+    with dpg.group(horizontal=True):
+        dpg.add_button(label="Convert Video", tag='convert_video', callback=convert_video)
+        dpg.add_button(label="Clear All", tag='clear_all', callback=clear_result)
 
 dpg.create_viewport(title='NoHotMILFs', width=900, height=600)
 dpg.setup_dearpygui()
