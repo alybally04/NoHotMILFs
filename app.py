@@ -11,12 +11,15 @@ dpg.create_context()
 def filesize_readable(number_of_bytes):
     if number_of_bytes < 1024:  # bytes
         units = 'bytes'
+
     elif number_of_bytes < 1048576:  # kilobytes
         number_of_bytes /= 1024
         units = 'KB'
+
     elif number_of_bytes < 1073741824:  # megabytes
         number_of_bytes /= 1048576
         units = 'MB'
+
     else:  # gigabytes
         number_of_bytes /= 1073741824
         units = 'GB'
@@ -28,13 +31,32 @@ def filesize_readable(number_of_bytes):
 
 
 # Formats ETA of video download from seconds remaining
-def eta_time_readable():
-    pass
+def eta_time_readable(seconds):
+    if seconds < 10:
+        eta = f'00:0{seconds}'
+
+    elif seconds < 60:
+        eta = f'00:{seconds}'
+
+    elif seconds < 3600:
+        minutes = seconds // 60
+        seconds %= 60
+        eta = f'{minutes}:{seconds}'
+
+    else:
+        minutes = seconds // 60
+        seconds %= 60
+
+        hours = minutes // 60
+        minutes %= 60
+
+        eta = f'{hours}:{minutes}:{seconds}'
+
+    return eta
 
 
 def convert_video():
-    items = ['formats_table', 'thumbnail', 'thumbnail_png', 'img_unavailable', 'video_title', 'download_complete',
-             'progress_bar']
+    items = ['formats_table', 'thumbnail', 'thumbnail_png', 'img_unavailable', 'video_title', 'download_complete']
     for item in items:
         if dpg.does_alias_exist(item):
             dpg.delete_item(item)
@@ -124,13 +146,16 @@ def download_video(sender, app_data, user_data):
         if response['status'] == 'downloading':
             downloaded_percent = (response["downloaded_bytes"]*100) // response["total_bytes"]
             downloaded_percent /= 100
+            time_remaining = eta_time_readable(response['eta'])
 
-            dpg.set_value("eta", response['eta'])
+            dpg.set_value("eta", time_remaining)
             dpg.set_value("progress_bar", downloaded_percent)
 
         elif response["status"] == "finished":
             file_name = response["filename"]
+            # dpg.add_text(f'Successfully downloaded {file_name}!', tag='download_complete', parent='main')
 
+    # , before = 'formats_table'
     with YoutubeDL({'quiet': True, 'noplaylist': True, 'cachedir': False, 'progress_hooks': [progress_hook], 'format': f'{format_id}+bestaudio[ext=m4a]', 'merge_output_format': 'mp4'}) as ydl:
         ydl.download(url)
 
@@ -144,7 +169,7 @@ with dpg.window(tag='main'):
     dpg.add_input_text(label="URL", tag='url_input', no_spaces=True)
     dpg.add_button(label="Convert Video", callback=convert_video)
 
-dpg.create_viewport(title='NoHotMILFs', width=800, height=500)
+dpg.create_viewport(title='NoHotMILFs', width=900, height=600)
 dpg.setup_dearpygui()
 
 dpg.show_viewport()
