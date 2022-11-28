@@ -33,7 +33,10 @@ def filesize_readable(number_of_bytes):
 
 # Formats ETA of video download from seconds remaining
 def eta_time_readable(seconds):
-    if seconds < 10:
+    if seconds is None:
+        eta = '00:00'
+
+    elif seconds < 10:
         eta = f'00:0{seconds}'
 
     elif seconds < 60:
@@ -68,8 +71,10 @@ def convert_video():
     try:
         with YoutubeDL({'quiet': True, 'noplaylist': True, 'cachedir': False}) as ydl:
             video_data = ydl.extract_info(url_input, download=False)
+
     except yt_dlp.utils.DownloadError:
         dpg.add_text('ERROR CONVERTING VIDEO - Check the URL is correct and try again', tag='conversion_error', parent='main', color=[255, 0, 0])
+
         dpg.delete_item('loading_indicator')
         dpg.configure_item('convert_video', enabled=True)
         dpg.configure_item('clear_all', enabled=True)
@@ -151,38 +156,43 @@ def download_video(sender, app_data, user_data):
     format_id = user_data[1]
 
     dpg.hide_item('formats_table')
-    dpg.add_text(f"ETA UNKNOWN", tag='eta', parent='main')
+    dpg.add_text('Downloading video file...', tag='current_download', parent='main')
+    dpg.add_text('Calculating ETA...', tag='eta', parent='main')
     dpg.add_progress_bar(tag='progress_bar', parent='main')
 
     def progress_hook(response):
+        download_count = 0
         if response['status'] == 'downloading':
             downloaded_percent = (response["downloaded_bytes"]*100) // response["total_bytes"]
             downloaded_percent /= 100
             time_remaining = eta_time_readable(response['eta'])
 
-            dpg.set_value("eta", time_remaining)
+            dpg.set_value("eta", f'ETA {time_remaining}')
             dpg.set_value("progress_bar", downloaded_percent)
 
-        elif response["status"] == "finished":
-            file_name = response["filename"]
-            # dpg.add_text(f'Successfully downloaded {file_name}!', tag='download_complete', parent='main')
+        elif response['status'] == 'finished':
+            download_count += 1
+            if download_count == 1:
+                dpg.set_value('current_download', 'Downloading audio file...')
 
-    # , before = 'formats_table'
     with YoutubeDL({'quiet': True, 'noplaylist': True, 'cachedir': False, 'progress_hooks': [progress_hook], 'format': f'{format_id}+bestaudio[ext=m4a]', 'merge_output_format': 'mp4'}) as ydl:
         ydl.download(url)
 
+    dpg.delete_item('current_download')
     dpg.delete_item('eta')
     dpg.delete_item('progress_bar')
+
+    dpg.add_text('Download Complete!', tag='download_complete', parent='main', before='formats_table', color=[6, 194, 0])
     dpg.show_item('formats_table')
 
 
 # Clears output from converting a video
 def clear_result(sender):
-    if sender == 'clear_result':
+    if sender == 'clear_all':
         dpg.set_value('url_input', value='')
 
     items = ['formats_table', 'thumbnail', 'thumbnail_png', 'img_unavailable', 'video_title', 'download_complete',
-             'conversion_error']
+             'conversion_error', 'download_complete']
     for item in items:
         if dpg.does_alias_exist(item):
             dpg.delete_item(item)
