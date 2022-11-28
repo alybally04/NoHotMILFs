@@ -1,9 +1,17 @@
 import os
+import platform
 import shutil
 import requests
 import dearpygui.dearpygui as dpg
 import yt_dlp.utils
 from yt_dlp import YoutubeDL
+
+# Getting downloads folder path
+if platform.system() == 'Windows':
+    downloads_path = '%USERPROFILE%/Downloads/'
+
+else:
+    downloads_path = '~/Downloads/'
 
 dpg.create_context()
 
@@ -110,7 +118,6 @@ def convert_video():
         dpg.add_table_column(label='Size')
         dpg.add_table_column()
 
-        bestaudio_size = 0
         # Parse available formats
         for video_format in video_data['formats']:
             # Filter out invalid formats
@@ -129,11 +136,15 @@ def convert_video():
 
                     if format_type == 'video':
                         dpg.add_text(video_format['format_note'])
-
                     else:
                         dpg.add_text(f"Audio only - {video_format['format_note']}")
 
                     if 'filesize' in video_format and type(video_format['filesize']) is int:
+                        dpg.add_text(filesize_readable(video_format['filesize']))
+                    else:
+                        dpg.add_text('UNAVAILABLE')
+
+                    '''if 'filesize' in video_format and type(video_format['filesize']) is int:
                         if format_type == 'video':
                             # Add size of audio file that will be added to video file during download to total size
                             total_size = video_format['filesize'] + bestaudio_size
@@ -148,7 +159,7 @@ def convert_video():
                         dpg.add_text(file_size)
 
                     else:
-                        dpg.add_text('UNAVAILABLE')
+                        dpg.add_text('UNAVAILABLE')'''
 
                     dpg.add_button(label='Download', callback=download_video,
                                    user_data=[url_input, video_data['title'], video_format['format_id'], file_type])
@@ -185,15 +196,26 @@ def download_video(sender, app_data, user_data):
         elif response['status'] == 'finished':
             dpg.set_value('current_download', 'Downloading audio file...')
 
+    if dpg.get_value('include_audio_best') is True:
+        # format_string = f'{format_id}+bestaudio[ext=m4a]'
+        format_string = f'{format_id}+bestaudio'
+
+    elif dpg.get_value('include_audio_worst') is True:
+        # format_string = f'{format_id}+worstaudio[ext=m4a]'
+        format_string = f'{format_id}+worstaudio'
+
+    else:
+        format_string = format_id
+
     with YoutubeDL({
         'quiet': True,
         'noplaylist': True,
         'cachedir': False,
         'progress_hooks': [progress_hook],
-        'format': f'{format_id}+bestaudio[ext=m4a]',
+        'format': format_string,
         'merge_output_format': file_type,
         # Begin string with r for raw string and f for f-string
-        'outtmpl': f"%USERPROFILE%/Downloads/NoHotMILFs - '{title}'.{file_type}",
+        'outtmpl': f"{downloads_path}NoHotMILFs - '{title}'.{file_type}",
         'updatetime': False
     }) as ydl:
 
@@ -220,6 +242,22 @@ def clear_result(sender):
             dpg.delete_item(item)
 
 
+def include_audio_best():
+    if dpg.is_item_enabled('include_audio_worst'):
+        dpg.configure_item('include_audio_worst', enabled=False)
+
+    else:
+        dpg.configure_item('include_audio_worst', enabled=True)
+
+
+def include_audio_worst():
+    if dpg.is_item_enabled('include_audio_best'):
+        dpg.configure_item('include_audio_best', enabled=False)
+
+    else:
+        dpg.configure_item('include_audio_best', enabled=True)
+
+
 with dpg.window(tag='main'):
     dpg.add_text("Please enter a YouTube URL")
     dpg.add_input_text(label="URL", tag='url_input', no_spaces=True)
@@ -227,6 +265,8 @@ with dpg.window(tag='main'):
     with dpg.group(horizontal=True):
         dpg.add_button(label="Convert Video", tag='convert_video', callback=convert_video)
         dpg.add_button(label="Clear All", tag='clear_all', callback=clear_result)
+        dpg.add_checkbox(label='Include Audio (High Quality)', tag='include_audio_best', default_value=True, callback=include_audio_best, enabled=True)
+        dpg.add_checkbox(label='Include Audio (Low Quality)', tag='include_audio_worst', callback=include_audio_worst, enabled=False)
 
 dpg.create_viewport(title='NoHotMILFs', width=900, height=600)
 dpg.setup_dearpygui()
