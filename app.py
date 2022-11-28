@@ -32,31 +32,33 @@ def filesize_readable(number_of_bytes):
 
 
 # Formats ETA of video download from seconds remaining
-def eta_time_readable(seconds):
-    if seconds is None:
-        eta = '00:00'
+def time_readable(num1):
+    # gets quotient (minutes)
+    minutes = num1 // 60
+    # gets remainder (seconds)
+    seconds = num1 % 60
 
-    elif seconds < 10:
-        eta = f'00:0{seconds}'
+    if minutes < 60:  # Formats time string for MIN:SEC format
+        if seconds >= 10:
+            duration = f'{minutes}:{seconds}'
+        else:
+            duration = f'{minutes}:0{seconds}'
+        return duration
 
-    elif seconds < 60:
-        eta = f'00:{seconds}'
-
-    elif seconds < 3600:
-        minutes = seconds // 60
-        seconds %= 60
-        eta = f'{minutes}:{seconds}'
-
-    else:
-        minutes = seconds // 60
-        seconds %= 60
-
+    else:  # Formats time string for HOUR:MIN:SEC format
         hours = minutes // 60
-        minutes %= 60
+        minutes = minutes % 60
 
-        eta = f'{hours}:{minutes}:{seconds}'
+        if minutes >= 10 and seconds >= 10:
+            duration = f'{hours}:{minutes}:{seconds}'
+        elif minutes >= 10:
+            duration = f'{hours}:{minutes}:0{seconds}'
+        elif seconds >= 10:
+            duration = f'{hours}:0{minutes}:{seconds}'
+        else:
+            duration = f'{hours}:0{minutes}:0{seconds}'
 
-    return eta
+    return duration
 
 
 def convert_video():
@@ -73,7 +75,8 @@ def convert_video():
             video_data = ydl.extract_info(url_input, download=False)
 
     except yt_dlp.utils.DownloadError:
-        dpg.add_text('ERROR CONVERTING VIDEO - Check the URL is correct and try again', tag='conversion_error', parent='main', color=[255, 0, 0])
+        dpg.add_text('ERROR CONVERTING VIDEO - Check the URL is correct and try again', tag='conversion_error',
+                     parent='main', color=[255, 0, 0])
 
         dpg.delete_item('loading_indicator')
         dpg.configure_item('convert_video', enabled=True)
@@ -116,8 +119,10 @@ def convert_video():
                     # Returns True if any numbers in string (There are no numbers in audio format names)
                     if any(char.isdigit() for char in video_format['format_note']):
                         format_type = 'video'
+                        file_type = 'mp4'
                     else:
                         format_type = 'audio'
+                        file_type = video_format['ext']
 
                     # Adding format name
                     dpg.add_text(video_format['ext'])
@@ -145,7 +150,8 @@ def convert_video():
                     else:
                         dpg.add_text('UNAVAILABLE')
 
-                    dpg.add_button(label='Download', callback=download_video, user_data=[url_input, video_format['format_id']])
+                    dpg.add_button(label='Download', callback=download_video,
+                                   user_data=[url_input, video_data['title'], video_format['format_id'], file_type])
 
     dpg.configure_item('convert_video', enabled=True)
     dpg.configure_item('clear_all', enabled=True)
@@ -153,36 +159,52 @@ def convert_video():
 
 def download_video(sender, app_data, user_data):
     url = user_data[0]
-    format_id = user_data[1]
+    title = user_data[1]
+    format_id = user_data[2]
+    file_type = user_data[3]
 
+    dpg.delete_item('download_complete')
     dpg.hide_item('formats_table')
-    dpg.add_text('Downloading video file...', tag='current_download', parent='main')
+
+    if file_type == 'mp4':
+        dpg.add_text('Downloading video file...', tag='current_download', parent='main')
+    else:
+        dpg.add_text('Downloading audio file...', tag='current_download', parent='main')
+
     dpg.add_text('Calculating ETA...', tag='eta', parent='main')
     dpg.add_progress_bar(tag='progress_bar', parent='main')
 
     def progress_hook(response):
-        download_count = 0
         if response['status'] == 'downloading':
-            downloaded_percent = (response["downloaded_bytes"]*100) // response["total_bytes"]
+            downloaded_percent = (response["downloaded_bytes"] * 100) // response["total_bytes"]
             downloaded_percent /= 100
-            time_remaining = eta_time_readable(response['eta'])
 
-            dpg.set_value("eta", f'ETA {time_remaining}')
+            dpg.set_value("eta", f"ETA {time_readable(response['eta'])}")
             dpg.set_value("progress_bar", downloaded_percent)
 
         elif response['status'] == 'finished':
-            download_count += 1
-            if download_count == 1:
-                dpg.set_value('current_download', 'Downloading audio file...')
+            dpg.set_value('current_download', 'Downloading audio file...')
 
-    with YoutubeDL({'quiet': True, 'noplaylist': True, 'cachedir': False, 'progress_hooks': [progress_hook], 'format': f'{format_id}+bestaudio[ext=m4a]', 'merge_output_format': 'mp4'}) as ydl:
+    with YoutubeDL({
+        'quiet': True,
+        'noplaylist': True,
+        'cachedir': False,
+        'progress_hooks': [progress_hook],
+        'format': f'{format_id}+bestaudio[ext=m4a]',
+        'merge_output_format': file_type,
+        # Begin string with r for raw string and f for f-string
+        'outtmpl': f"%USERPROFILE%/Downloads/NoHotMILFs - '{title}'.{file_type}",
+        'updatetime': False
+    }) as ydl:
+
         ydl.download(url)
 
     dpg.delete_item('current_download')
     dpg.delete_item('eta')
     dpg.delete_item('progress_bar')
 
-    dpg.add_text('Download Complete!', tag='download_complete', parent='main', before='formats_table', color=[6, 194, 0])
+    dpg.add_text('Download Complete! - File is in "Downloads" folder!', tag='download_complete', parent='main', before='formats_table',
+                 color=[6, 194, 0])
     dpg.show_item('formats_table')
 
 
