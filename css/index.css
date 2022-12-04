@@ -1,0 +1,39 @@
+body {
+  font-family: "SF Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+}
+
+header {
+  text-align: center;
+}
+
+footer {
+  text-align: center;
+  margin-top: 10vh;
+}
+
+.download-button {
+  color: white;
+  background-color: red;
+  width: 50%;
+  margin-left: 25%;
+  margin-right: 25%;
+}
+
+.download-button:hover {
+  background-color: black;
+}
+
+#input-field {
+  margin: 5vh 0 5vh 0;
+}
+
+#formats-table table, th, td {
+  table-layout: fixed;
+  border-collapse: collapse;
+  border:1px solid black;
+}
+
+
+#formats-table th {
+  width: 20vw;
+}
