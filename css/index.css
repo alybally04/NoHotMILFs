@@ -11,16 +11,30 @@ footer {
   margin-top: 10vh;
 }
 
-.download-button {
+input[type=button] {
+  border: none;
+  padding-top: 1vh;
+  padding-bottom: 1vh;
   color: white;
   background-color: red;
-  width: 50%;
-  margin-left: 25%;
-  margin-right: 25%;
+  transition: transform 0.075s;
 }
 
-.download-button:hover {
+input[type=button]:hover {
   background-color: black;
+}
+
+input[type=button]:active {
+  transform: scale(0.9);
+}
+
+#convert-button {
+  padding: 2vh 2vw 2vh 2vw;
+}
+
+#url-input {
+  width: 70vw;
+  font-size: 1.25rem;
 }
 
 #input-field {
@@ -33,7 +47,15 @@ footer {
   border:1px solid black;
 }
 
-
 #formats-table th {
   width: 20vw;
+}
+
+#formats-table td {
+  height: 5vh;
+}
+
+#formats-table input[type=button] {
+  width: 60%;
+  margin: 2vh 20% 2vh 20%;
 }
