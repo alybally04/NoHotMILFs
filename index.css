@@ -4,7 +4,15 @@ body {
 }
 
 header {
-  text-align: center;
+  margin: 0 auto 0 auto;
+  height: 25vh;
+  width: 50vw;
+}
+
+header img {
+  width: 250px;
+  position: fixed;
+  right: 70%;
 }
 
 footer {
@@ -37,10 +45,10 @@ input[type=button]:active {
 
 #url-input label {
   color: white;
-  background-color: black;
+  background-color: red;
   padding: 2.4vh 0.5vw;
   font-weight: bold;
-  font-size: 110%;
+  font-size: 115%;
 }
 
 #input-field {
@@ -49,6 +57,11 @@ input[type=button]:active {
   padding: 2vh 1vw;
   line-height: 2.4vh;
   font-size: large;
+  border: 5px solid red;
+}
+
+#input-field:focus {
+  outline-width: 0;
 }
 
 #search-button {
