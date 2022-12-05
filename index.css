@@ -1,5 +1,6 @@
 body {
   font-family: "SF Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  text-align: center;
 }
 
 header {
@@ -28,17 +29,38 @@ input[type=button]:active {
   transform: scale(0.9);
 }
 
-#convert-button {
-  padding: 2vh 2vw 2vh 2vw;
+#url-input {
+  margin: 8vh auto;
+  width: 90vw;
+  max-width: 1600px;
 }
 
-#url-input {
-  width: 70vw;
-  font-size: 1.25rem;
+#url-input label {
+  color: white;
+  background-color: black;
+  padding: 2.4vh 0.5vw;
+  font-weight: bold;
+  font-size: 110%;
 }
 
 #input-field {
-  margin: 5vh 0 5vh 0;
+  width: 60%;
+  min-width: 25%;
+  padding: 2vh 1vw;
+  line-height: 2.4vh;
+  font-size: large;
+}
+
+#search-button {
+  margin-left: 2vw;
+  padding: 2vh 3vw;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  font-size: 110%;
+}
+
+#formats-table table {
+  margin: 8vh auto;
 }
 
 #formats-table table, th, td {
@@ -48,14 +70,15 @@ input[type=button]:active {
 }
 
 #formats-table th {
-  width: 20vw;
+  width: 18vw;
+  max-width: 200px;
 }
 
 #formats-table td {
-  height: 5vh;
+  height: 3vh;
 }
 
 #formats-table input[type=button] {
   width: 60%;
-  margin: 2vh 20% 2vh 20%;
+  margin: 1vh 1vw;
 }

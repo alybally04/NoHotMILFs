@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>NoHotMILFs</title>
-    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="index.css">
   </head>
   <body>
     <header>
@@ -12,11 +12,10 @@
     </header>
 
     <main>
-      <section id="input-field">
-        <form>
-          <label for="url-input">YouTube URL:</label>
-          <input type="url" id="url-input">
-          <input type="button" id="convert-button" value="Convert" onclick="">
+      <section id="url-input">
+        <form> <!-- Label cannot be seperate line to input tag as makes browsers die inside -->
+          <label for="url-input">YouTube URL:</label><input type="url" id="input-field">
+          <input type="button" id="search-button" value="Convert" onclick="">
         </form> 
       </section>
 
