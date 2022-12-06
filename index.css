@@ -4,7 +4,7 @@ body {
 }
 
 header {
-  margin: 0 auto 0 auto;
+  margin: 5vh auto 0 auto;
   height: 25vh;
   width: 50vw;
 }
@@ -39,16 +39,17 @@ input[type=button]:active {
 
 #url-input {
   margin: 8vh auto;
-  width: 90vw;
+  width: 98vw;
   max-width: 1600px;
 }
 
 #url-input label {
   color: white;
   background-color: red;
-  padding: 2.4vh 0.5vw;
+  padding: 2.5vh 0.5vw 2.5vh 0.5vw;
   font-weight: bold;
   font-size: 115%;
+  border-radius: 0.3rem;
 }
 
 #input-field {
@@ -57,7 +58,7 @@ input[type=button]:active {
   padding: 2vh 1vw;
   line-height: 2.4vh;
   font-size: large;
-  border: 5px solid red;
+  border: none;
 }
 
 #input-field:focus {
