@@ -1,4 +1,13 @@
 const { app, BrowserWindow } = require('electron');
+const electron = require("electron");
+
+if (process.platform === 'darwin') {
+  const icon = electron.nativeImage.createFromPath(app.getAppPath() + "/assets/icons/icon.icns")
+  app.dock.setIcon(icon)
+
+} else {
+  app.win.setIcon(__dirname + 'assets/icons/icon.ico')
+}
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -8,7 +17,7 @@ const createWindow = () => {
     minHeight: 600,
   });
 
-  win.loadFile('home.html');
+  win.loadFile('index.html');
 };
 
 app.whenReady().then(() => {
