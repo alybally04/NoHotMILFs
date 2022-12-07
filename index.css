@@ -46,10 +46,10 @@ input[type=button]:active {
 #url-input label {
   color: white;
   background-color: red;
-  padding: 2.5vh 0.5vw 2.5vh 0.5vw;
+  padding: 2.7vh 0.7vw 2.8vh 0.8vw;
   font-weight: bold;
   font-size: 115%;
-  border-radius: 0.3rem;
+  border-radius: 0.4rem;
 }
 
 #input-field {
@@ -80,16 +80,21 @@ input[type=button]:active {
 #formats-table table, th, td {
   table-layout: fixed;
   border-collapse: collapse;
-  border:1px solid black;
 }
 
 #formats-table th {
   width: 18vw;
   max-width: 200px;
+  background-color: red;
+  color: white;
 }
 
-#formats-table td {
-  height: 3vh;
+#formats-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#formats-table th, td {
+  height: 4vh;
 }
 
 #formats-table input[type=button] {
