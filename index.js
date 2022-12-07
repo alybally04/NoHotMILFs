@@ -8,7 +8,7 @@ const createWindow = () => {
     minHeight: 600,
   });
 
-  win.loadFile('index.html');
+  win.loadFile('home.html');
 };
 
 app.whenReady().then(() => {
