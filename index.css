@@ -71,6 +71,18 @@ input[type=button]:active {
   font-size: 110%;
 }
 
+#video-details {
+  will-change: transform;
+  height: 20vh;
+}
+
+#video-details img {
+  text-align: left;
+  height: 25vh;
+  position: fixed;
+  left: 25%;
+}
+
 #formats-table table {
   margin: 8vh auto;
 }
