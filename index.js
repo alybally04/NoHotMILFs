@@ -10,7 +10,7 @@ const createWindow = () => {
     // icon: __dirname + '/assets/icons/icon.ico'
   });
 
-  win.loadFile('index.html');
+  win.loadFile('pageFiles/index.html');
   win.removeMenu();
 }
 
