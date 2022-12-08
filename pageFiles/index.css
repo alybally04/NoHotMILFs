@@ -6,7 +6,7 @@ body {
 
 header {
   width: 100%;
-  margin-bottom: 15vh;
+  margin-bottom: 10vh;
   background-color: #FF0000;
 }
 
@@ -36,7 +36,7 @@ input[type=button]:active {
 }
 
 #url-input {
-  margin: 8vh auto;
+  margin: 0 auto 10vh auto;
   width: 98vw;
   max-width: 1600px;
 }
@@ -51,7 +51,6 @@ input[type=button]:active {
 }
 
 #input-field {
-  max-width: 1200px;
   width: 50vw;
   padding: 2vh 1vw;
   line-height: 2.4vh;
@@ -80,7 +79,7 @@ input[type=button]:active {
   height: 100px;
   width: 80vw;
   max-width: 1000px;
-  margin: 0 auto 15vh auto;
+  margin: 0 auto 10vh auto;
 }
 
 #video-details img {
@@ -110,7 +109,7 @@ input[type=button]:active {
 }
 
 #formats-table table {
-  margin: 8vh auto;
+  margin: 0 auto 10vh auto;
 }
 
 #formats-table table, th, td {

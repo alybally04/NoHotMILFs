@@ -6,7 +6,10 @@ module.exports = {
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        authors: 'Evelyn Jones',
+        description: 'A GUI for yt-dlp',
+      },
     },
     {
       name: '@electron-forge/maker-zip',
