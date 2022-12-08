@@ -81,7 +81,25 @@ input[type=button]:active {
   text-align: left;
   height: 20vh;
   position: fixed;
-  right: 70%;
+  right: 75%;
+}
+
+#video-details div {
+  width: max-content;
+  padding-top: 3vh;
+  margin: 0 auto 0 35vw;
+}
+
+#video-details ul {
+  color: white;
+  background-color: black;
+  padding: 2vh 2vw 2vh 2vw;
+  border-radius: 2rem;
+}
+
+#video-details li {
+  display: inline-block;
+  margin: 0 1vw 0 1vw;
 }
 
 #formats-table table {

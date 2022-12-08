@@ -6,8 +6,7 @@ const createWindow = () => {
     width: 1000,
     height: 800,
     minWidth: 800,
-    minHeight: 600,
-    // icon: __dirname + '/assets/icons/icon.ico'
+    minHeight: 600
   });
 
   win.loadFile('pageFiles/index.html');
