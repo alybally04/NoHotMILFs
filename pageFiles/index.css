@@ -74,13 +74,14 @@ input[type=button]:active {
 #video-details {
   will-change: transform;
   height: 20vh;
+  margin-bottom: 15vh;
 }
 
 #video-details img {
   text-align: left;
-  height: 25vh;
+  height: 20vh;
   position: fixed;
-  left: 25%;
+  right: 70%;
 }
 
 #formats-table table {
