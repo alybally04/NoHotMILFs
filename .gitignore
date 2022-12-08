@@ -1,5 +1,7 @@
 
-.DS_Store
 .idea/
-node_modules/
-out/
+venv/
+.DS_Store
+*.mp4
+*.3gp
+*.m4a
