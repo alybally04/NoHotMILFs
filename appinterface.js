@@ -1,12 +1,13 @@
 const {PythonShell} = require('python-shell')
-const { app } = require('electron');
 
 let options = {
-    mode: 'text',
+    mode: 'json',
     pythonPath: ((process.platform === 'win32') ? 'venv\\Scripts\\python.exe' : 'venv/bin/python'),
-    pythonOptions: ['-u'], // get print results in real-time
-    scriptPath: '', //Path to directory of script
-    args: []
+    // Get print results in real-time
+    pythonOptions: ['-u'],
+    // Path to directory of script
+    scriptPath: '',
+    args: ['lookup_video', 'https://www.youtube.com/watch?v=C2J5sJ7Z5yE']
 };
 
 const pyshell = PythonShell.run('app.py', options, function (err, results) {
@@ -16,3 +17,18 @@ const pyshell = PythonShell.run('app.py', options, function (err, results) {
 });
 
 
+pyshell.on('message', function (message) {
+  // received a message sent from the Python script (a simple "print" statement)
+  console.log(message);
+  if (message.hasOwnProperty('error')) {
+      console.log('An error occurred')
+  }
+});
+
+// end the input stream and allow the process to exit
+pyshell.end(function (err,code,signal) {
+    if (err) throw err;
+    console.log('The exit code was: ' + code);
+    console.log('The exit signal was: ' + signal);
+    console.log('finished');
+});

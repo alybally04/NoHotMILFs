@@ -1,13 +1,12 @@
-print('bussy')
-
-'''import platform
+import platform
+import sys
+import json
 import yt_dlp.utils
 from yt_dlp import YoutubeDL
 
 # Getting downloads folder path
 if platform.system() == 'Windows':
     downloads_path = '%USERPROFILE%/Downloads/'
-
 else:
     downloads_path = '~/Downloads/'
 
@@ -15,7 +14,7 @@ else:
 # Convert bits into Human-readable format
 def filesize_readable(number_of_bytes):
     if number_of_bytes < 1024:  # bytes
-        units = 'bytes'
+        units = 'Bytes'
 
     elif number_of_bytes < 1048576:  # kilobytes
         number_of_bytes /= 1024
@@ -65,18 +64,40 @@ def time_readable(num1):
     return duration
 
 
-def lookup_video(url_input):
+def lookup_video():
     try:
         with YoutubeDL({'quiet': True, 'noplaylist': True, 'cachedir': False}) as ydl:
-            video_data = ydl.extract_info(url_input, download=False)
+            raw_info = ydl.extract_info(url_input, download=False)
+
+        video_data_dict = {}
+        for count, video_format in enumerate(raw_info['formats']):
+            if video_format['ext'] != 'mhtml':
+                if any(char.isdigit() for char in video_format['format_note']):
+                    format_type = 'video'
+                    file_type = 'mp4'
+                    quality = video_format['format_note']
+                else:
+                    format_type = 'audio'
+                    file_type = video_format['ext']
+                    quality = f"Audio only - {video_format['format_note']}"
+
+                if 'filesize' in video_format and type(video_format['filesize']) is int:
+                    file_size = filesize_readable(video_format['filesize'])
+                else:
+                    file_size = 'UNAVAILABLE'
+
+                entry = {"format_type": format_type, "file_type": file_type, "quality": quality, "file_size": file_size}
+                video_data_dict.update({f"entry{count}": entry})
+        video_data = json.dumps(video_data_dict)
 
     except yt_dlp.utils.DownloadError:
-        pass
-        # dpg.add_text('ERROR CONVERTING VIDEO - Check the URL is correct and try again', tag='conversion_error',
-                    # parent='main', color=[255, 0, 0])
+        video_data = {"error": "DownloadError"}
+
+    # return data as string to pass it back to appinterface.js which will be parsed as json
+    return video_data
 
 
-def download_video(url, title, format_id, file_type):
+def download_video(url, title, format_id, file_type, include_audio):
     if file_type == 'mp4':
         pass
         # dpg.add_text('Downloading video file...', tag='current_download', parent='main')
@@ -89,6 +110,8 @@ def download_video(url, title, format_id, file_type):
             downloaded_percent = (response["downloaded_bytes"] * 100) // response["total_bytes"]
             downloaded_percent /= 100
 
+            eta = f"ETA: {time_readable(response['eta'])}"
+            print('{"eta": "' + eta + '"}')
             # dpg.set_value("eta", f"ETA {time_readable(response['eta'])}")
             # dpg.set_value("progress_bar", downloaded_percent)
 
@@ -96,11 +119,11 @@ def download_video(url, title, format_id, file_type):
             pass
             # dpg.set_value('current_download', 'Downloading audio file...')
 
-    if dpg.get_value('include_audio_best') is True:
+    if include_audio == 'best':
         # format_string = f'{format_id}+bestaudio[ext=m4a]'
         format_string = f'{format_id}+bestaudio'
 
-    elif dpg.get_value('include_audio_worst') is True:
+    elif include_audio == 'worst':
         # format_string = f'{format_id}+worstaudio[ext=m4a]'
         format_string = f'{format_id}+worstaudio'
 
@@ -119,4 +142,11 @@ def download_video(url, title, format_id, file_type):
         'updatetime': False
     }) as ydl:
 
-        ydl.download(url)'''
+        ydl.download(url)
+
+
+command = sys.argv[1]
+url_input = sys.argv[2]
+
+if command == 'lookup_video':
+    print(lookup_video())
