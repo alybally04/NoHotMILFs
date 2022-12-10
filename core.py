@@ -93,7 +93,7 @@ def lookup_video():
     except yt_dlp.utils.DownloadError:
         video_data = {"error": "DownloadError"}
 
-    # return data as string to pass it back to appinterface.js which will be parsed as json
+    # return data as string to pass it back to coreInterface.js which will be parsed as json
     return video_data
 
 
