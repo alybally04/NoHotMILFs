@@ -1,0 +1,138 @@
+body {
+  font-family: "SF Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  text-align: center;
+  margin: 0;
+}
+
+header {
+  width: 100%;
+  margin-bottom: 10vh;
+  background-color: #FF0000;
+}
+
+header img {
+  width: 300px;
+}
+
+footer {
+  margin-top: 10vh;
+}
+
+input[type=button] {
+  border: none;
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+  color: white;
+  background-color: #FF0000;
+  transition: transform 0.075s;
+}
+
+input[type=button]:hover {
+  background-color: black;
+}
+
+input[type=button]:active {
+  transform: scale(0.9);
+}
+
+#url-input {
+  margin: 0 auto 10vh auto;
+  width: 98vw;
+  max-width: 1600px;
+}
+
+#url-input label {
+  color: white;
+  background-color: #FF0000;
+  padding: 2.7vh 1vh 2.8vh 1vh;
+  font-weight: bold;
+  font-size: 115%;
+  border-radius: 0.4rem;
+}
+
+#input-field {
+  width: 50vw;
+  padding: 2vh 1vw;
+  line-height: 2.4vh;
+  font-size: large;
+  border: none;
+}
+
+#input-field:focus {
+  outline-width: 0;
+}
+
+#search-button {
+  margin-left: 2vw;
+  padding: 2vh 3vw;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  font-size: 110%;
+}
+
+#video-details {
+  will-change: transform;
+  padding: 3vh 3vw 3vh 3vw;
+  background-color: #f2f2f2;
+  border: black 0.75vh solid;
+  border-radius: 0.4rem;
+  height: 100px;
+  width: 80vw;
+  max-width: 1000px;
+  margin: 0 auto 10vh auto;
+}
+
+#video-details img {
+  height: 100px;
+  position: fixed;
+  right: 70%;
+}
+
+#video-details div {
+  width: max-content;
+  margin: 0 10% 0 auto;
+}
+
+#video-details li {
+  display: inline-block;
+  margin: 0 1vw 0 1vw;
+}
+
+@media (max-width: 1000px) {
+  #video-details {
+    width: 700px;
+  }
+
+  #video-details div {
+    margin: 0 5% 0 auto;
+  }
+}
+
+#formats-table table {
+  margin: 0 auto 10vh auto;
+}
+
+#formats-table table, th, td {
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+#formats-table th {
+  width: 18vw;
+  max-width: 200px;
+  background-color: #FF0000;
+  color: white;
+}
+
+#formats-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#formats-table th, td {
+  height: 4vh;
+}
+
+#formats-table input[type=button] {
+  width: 60%;
+  margin: 1vh 1vw;
+}
