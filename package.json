@@ -30,6 +30,6 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
-    "python-shell": "^3.0.1"
+    "yt-dlp-wrap": "^2.3.11"
   }
 }
