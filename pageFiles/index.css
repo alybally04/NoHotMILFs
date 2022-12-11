@@ -103,8 +103,8 @@ input[type=button]:active {
 }
 
 #video-details li {
-  display: inline-block;
-  margin: 3px 1vw 8px 1vw;
+  display: inline;
+  margin: 3px 4px 8px;
 }
 
 #formats-table table {
