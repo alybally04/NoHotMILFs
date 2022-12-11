@@ -71,14 +71,14 @@ input[type=button]:active {
 }
 
 #video-details {
+  visibility: hidden;
   will-change: transform;
   padding: 3vh 3vw 3vh 3vw;
   background-color: #f2f2f2;
   border: black 0.75vh solid;
   border-radius: 0.4rem;
   height: 100px;
-  width: 80vw;
-  max-width: 1000px;
+  width: 650px;
   margin: 0 auto 10vh auto;
 }
 
@@ -89,23 +89,23 @@ input[type=button]:active {
 }
 
 #video-details div {
-  width: max-content;
-  margin: 0 10% 0 auto;
+  width: 500px;
+  margin: 0 -4% 0 auto;
+}
+
+#video-details h3 {
+  height: 22px;
+  margin-top: 6px;
+}
+
+#video-details ul {
+  padding: 0;
+  height: 20px;
 }
 
 #video-details li {
   display: inline-block;
-  margin: 0 1vw 0 1vw;
-}
-
-@media (max-width: 1000px) {
-  #video-details {
-    width: 700px;
-  }
-
-  #video-details div {
-    margin: 0 5% 0 auto;
-  }
+  margin: 3px 1vw 8px 1vw;
 }
 
 #formats-table table {

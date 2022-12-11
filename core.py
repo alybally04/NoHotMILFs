@@ -64,12 +64,34 @@ def time_readable(num1):
     return duration
 
 
+# Formatting the date of upload to be easily readable in "dd/mm/yyyy" format
+def date_readable(num1):
+    raw = str(num1)
+    dd = raw[6:8]
+    mm = raw[4:6]
+    yyyy = raw[0:4]
+
+    date = f'{dd}/{mm}/{yyyy}'
+    return date
+
+
 def lookup_video():
     try:
         with YoutubeDL({'quiet': True, 'noplaylist': True, 'cachedir': False}) as ydl:
             raw_info = ydl.extract_info(url_input, download=False)
 
-        entries = []
+        video_data = {
+            # Keys in camelCase for use in JavaScriptu
+            'title': raw_info['title'],
+            'channel': raw_info['uploader'],
+            'duration': time_readable(raw_info['duration']),
+            'seconds': raw_info['duration'],
+            'uploadDate': date_readable(raw_info['upload_date']),
+            'videoUrl': raw_info['webpage_url'],
+            'thumbnail': raw_info['thumbnail']
+        }
+
+        format_entries = []
         for count, video_format in enumerate(raw_info['formats']):
             if video_format['ext'] != 'mhtml':
                 if any(char.isdigit() for char in video_format['format_note']):
@@ -87,11 +109,13 @@ def lookup_video():
                     file_size = 'UNAVAILABLE'
 
                 entry = {"format_type": format_type, "file_type": file_type, "quality": quality, "file_size": file_size}
-                entries.append(entry)
-        video_data = json.dumps({"entries": entries})
+                format_entries.append(entry)
+
+        # Dumping JSON to return to renderer process
+        video_data = json.dumps({"videoInfo": video_data, "formats": format_entries})
 
     except yt_dlp.utils.DownloadError:
-        video_data = {"error": "DownloadError"}
+        video_data = json.dumps({"error": "DownloadError"})
 
     # return data as string to pass it back to coreInterface.js which will be parsed as json
     return video_data
