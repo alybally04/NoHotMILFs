@@ -22,7 +22,8 @@ function lookupVideo(url_input) {
     pyshell.on('message', function (message) {
       // received a message sent from the Python script (a simple "print" statement)
       console.log(message);
-      document.querySelector('main').innerHTML = '<p>' + message.entries + '</p>'
+      let resultsList = JSON.parse(message)
+      document.querySelector('main').innerHTML = '<p>' + resultsList + '</p>'
 
       if (message.hasOwnProperty('error')) {
           console.log('An error occurred in core.py')
