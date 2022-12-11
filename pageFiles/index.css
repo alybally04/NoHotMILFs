@@ -85,17 +85,16 @@ input[type=button]:active {
 #video-details img {
   height: 100px;
   position: fixed;
-  right: 70%;
+  right: 75%;
 }
 
 #video-details div {
   width: 500px;
-  margin: 0 -4% 0 auto;
+  margin: 7px -4% 0 auto;
 }
 
 #video-details h3 {
   height: 22px;
-  margin-top: 6px;
 }
 
 #video-details ul {
