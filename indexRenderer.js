@@ -25,14 +25,21 @@ function lookupVideo() {
         let parsedMessage = JSON.parse(message);
 
         document.querySelector('#video-details').style.visibility = 'visible';
+        document.querySelector('#formats-table').style.visibility = 'visible';
+
         if (parsedMessage.hasOwnProperty('error')) {
+
             document.querySelector('#video-details h3').innerHTML = 'An error has occurred!';
+            document.querySelector('#video-details img').src = '../assets/images/imageUnavailable.png';
+
             const videoDetails = document.querySelectorAll('#video-details li')
 
             videoDetails[0].innerHTML = '';
             videoDetails[1].innerHTML = 'Please ensure the URL was entered correctly and try again';
             videoDetails[2].innerHTML = '';
+
         } else {
+
             let videoInfo = parsedMessage.videoInfo;
             let formats = parsedMessage.formats;
 
@@ -44,6 +51,43 @@ function lookupVideo() {
             videoDetails[0].innerHTML = `Length: ${videoInfo.duration}`;
             videoDetails[1].innerHTML = `Channel: ${videoInfo.channel}`;
             videoDetails[2].innerHTML = `Upload Date: ${videoInfo.uploadDate}`;
+
+            // Generating formats table
+            // const table = document.querySelector('#formats-table table')
+            // const tablebody = document.querySelector('#formats-table tbody')
+
+            const table = document.createElement("table");
+            const tablebody = document.createElement("tbody");
+
+            for (let count = 0; count < formats.length; count++) {
+                const row = document.createElement('tr');
+
+                for (let i = 0; i < 4; i++) {
+                    const cell = document.createElement('td');
+
+                    if (i === 0) {
+                        const cellData = document.createTextNode(formats[count].fileType);
+
+                    } else if (i === 1) {
+                        const cellData = document.createTextNode(formats[count].quality);
+
+                    } else if (i === 2) {
+                        const cellData = document.createTextNode(formats[count].fileSize);
+
+                    } else {
+                        const cellData = document.createElement('input');
+                        cellData.type = 'button';
+                        cellData.value = 'Download';
+                        // cellData.onclick = '';
+                    }
+
+                    cell.appendChild(cellData)
+                    row.appendChild(cell)
+                }
+                tablebody.appendChild(row)
+            }
+            table.appendChild(tablebody)
+            document.body.appendChild(table);
         }
     });
 

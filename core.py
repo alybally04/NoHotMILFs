@@ -108,7 +108,7 @@ def lookup_video():
                 else:
                     file_size = 'UNAVAILABLE'
 
-                entry = {"format_type": format_type, "file_type": file_type, "quality": quality, "file_size": file_size}
+                entry = {"fileType": file_type, "quality": quality, "fileSize": file_size}
                 format_entries.append(entry)
 
         # Dumping JSON to return to renderer process

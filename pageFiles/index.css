@@ -85,7 +85,7 @@ input[type=button]:active {
 #video-details img {
   height: 100px;
   position: fixed;
-  right: 75%;
+  right: 72%;
 }
 
 #video-details div {
@@ -102,9 +102,13 @@ input[type=button]:active {
   height: 20px;
 }
 
+#formats-table {
+  visibility: hidden;
+}
+
 #video-details li {
   display: inline;
-  margin: 3px 4px 8px;
+  margin: 4px 4px 8px;
 }
 
 #formats-table table {
