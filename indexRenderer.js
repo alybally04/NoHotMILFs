@@ -38,5 +38,3 @@ function lookupVideo(url_input) {
         // console.log('finished');
     });
 }
-
-// lookupVideo('https://www.youtube.com/watch?v=951X1IgtL5M')

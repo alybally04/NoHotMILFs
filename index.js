@@ -8,6 +8,7 @@ const createWindow = () => {
     minWidth: 800,
     minHeight: 600,
     webPreferences: {
+      // Allows page renderers to access node js (ONLY do this in offline app!)
       nodeIntegration: true,
       contextIsolation: false,
     }
