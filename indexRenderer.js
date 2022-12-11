@@ -54,40 +54,70 @@ function lookupVideo() {
 
             // Generating formats table
             // const table = document.querySelector('#formats-table table')
-            // const tablebody = document.querySelector('#formats-table tbody')
+            // const tableBody = document.querySelector('#formats-table tbody')
+
+            const formatsTableSection = document.querySelector('#formats-table')
+            formatsTableSection.innerHTML = '';
 
             const table = document.createElement("table");
-            const tablebody = document.createElement("tbody");
+            const tableHead = document.createElement('thead');
+            const tableBody = document.createElement("tbody");
 
+            // Generating tableHead
+            if (true) {
+                const row = document.createElement('tr');
+
+                const cell1 = document.createElement('th');
+                cell1.appendChild(document.createTextNode('Format'));
+                row.appendChild(cell1);
+
+                const cell2 = document.createElement('th');
+                cell2.appendChild(document.createTextNode('Quality'));
+                row.appendChild(cell2);
+
+                const cell3 = document.createElement('th');
+                cell3.appendChild(document.createTextNode('Size'));
+                row.appendChild(cell3);
+
+                // No text as button column
+                const cell4 = document.createElement('th');
+                row.appendChild(cell4);
+
+                tableBody.appendChild(row)
+            }
+
+
+            // Generating tableBody
             for (let count = 0; count < formats.length; count++) {
                 const row = document.createElement('tr');
 
                 for (let i = 0; i < 4; i++) {
                     const cell = document.createElement('td');
+                    let cellData;
 
                     if (i === 0) {
-                        const cellData = document.createTextNode(formats[count].fileType);
+                        cellData = document.createTextNode(formats[count].fileType);
 
                     } else if (i === 1) {
-                        const cellData = document.createTextNode(formats[count].quality);
+                        cellData = document.createTextNode(formats[count].quality);
 
                     } else if (i === 2) {
-                        const cellData = document.createTextNode(formats[count].fileSize);
+                        cellData = document.createTextNode(formats[count].fileSize);
 
                     } else {
-                        const cellData = document.createElement('input');
+                        cellData = document.createElement('input');
                         cellData.type = 'button';
                         cellData.value = 'Download';
-                        // cellData.onclick = '';
+                        cellData.onclick = downloadVideo();
                     }
 
                     cell.appendChild(cellData)
                     row.appendChild(cell)
                 }
-                tablebody.appendChild(row)
+                tableBody.appendChild(row)
             }
-            table.appendChild(tablebody)
-            document.body.appendChild(table);
+            table.appendChild(tableBody)
+            formatsTableSection.appendChild(table);
         }
     });
 
@@ -98,4 +128,9 @@ function lookupVideo() {
         // console.log('The exit signal was: ' + signal);
         // console.log('finished');
     });
+}
+
+
+function downloadVideo() {
+
 }
