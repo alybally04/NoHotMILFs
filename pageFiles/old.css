@@ -6,7 +6,7 @@ body {
 
 header {
   width: 100%;
-  margin-bottom: 80px;
+  margin-bottom: 10vh;
   background-color: #FF0000;
 }
 
@@ -15,7 +15,7 @@ header img {
 }
 
 footer {
-
+  margin-top: 10vh;
 }
 
 input[type=button] {
@@ -52,7 +52,9 @@ input[type=button]:active {
 }
 
 #url-input {
-  margin-bottom: 80px;
+  margin: 0 auto 10vh auto;
+  width: 98vw;
+  max-width: 1600px;
 }
 
 #url-input label {
@@ -77,8 +79,8 @@ input[type=button]:active {
 }
 
 #search-button {
-  margin-left: 15px;
-  padding: 15px 25px;
+  margin-left: 2vw;
+  padding: 2vh 3vw;
   border-radius: 0.5rem;
   font-weight: bold;
   font-size: 110%;
@@ -86,9 +88,9 @@ input[type=button]:active {
 
 #video-details {
   will-change: transform;
-  padding: 30px;
+  padding: 3vh 3vw 3vh 3vw;
   background-color: #f2f2f2;
-  border: black 5px solid;
+  border: black 0.75vh solid;
   border-radius: 0.4rem;
   height: 100px;
   width: 650px;
@@ -98,23 +100,53 @@ input[type=button]:active {
 #video-details img {
   height: 100px;
   position: fixed;
-  right: 70%;
+  right: 72%;
 }
 
 #video-details div {
-  margin-left: 32%;
+  width: 500px;
+  margin: 7px -4% 0 auto;
 }
 
 #video-details h3 {
-  margin-top: 0;
+  height: 22px;
 }
 
 #video-details ul {
   padding: 0;
+  height: 20px;
 }
 
 #video-details li {
-  display: inline-block;
-  margin: 3px 4px;
-  white-space: nowrap;
+  display: inline;
+  margin: 4px 4px 8px;
+}
+
+#formats-table table {
+  margin: 0 auto 10vh auto;
+}
+
+#formats-table table, th, td {
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+#formats-table th {
+  width: 18vw;
+  max-width: 200px;
+  background-color: #FF0000;
+  color: white;
+}
+
+#formats-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#formats-table th, td {
+  height: 4vh;
+}
+
+#formats-table input[type=button] {
+  width: 60%;
+  margin: 1vh 1vw;
 }

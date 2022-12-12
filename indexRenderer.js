@@ -1,5 +1,6 @@
 const {PythonShell} = require('python-shell')
 
+// Setting containers to be invisible at launch
 window.onload = function() {
     document.querySelector('#loading-icon').style.display = 'none';
     document.querySelector('#video-details').style.display = 'none';
