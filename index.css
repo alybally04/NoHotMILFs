@@ -20,8 +20,8 @@ footer {
 
 input[type=button] {
   border: none;
-  padding-top: 1vh;
-  padding-bottom: 1vh;
+  padding-top: 5px;
+  padding-bottom: 5px;
   color: white;
   background-color: #FF0000;
   transition: transform 0.075s;
@@ -43,7 +43,7 @@ input[type=button]:active {
   width: 100px;
   height: 100px;
   animation: spin 1.2s linear infinite;
-  margin: 0 auto 10vh auto;
+  margin: 0 auto 80px auto;
 }
 
 @keyframes spin {
@@ -92,7 +92,7 @@ input[type=button]:active {
   border-radius: 0.4rem;
   height: 100px;
   width: 650px;
-  margin: 0 auto 10vh auto;
+  margin: 0 auto 80px auto;
 }
 
 #video-details img {
@@ -117,4 +117,29 @@ input[type=button]:active {
   display: inline-block;
   margin: 3px 4px;
   white-space: nowrap;
+}
+
+#formats-table table {
+  margin: 0 auto 80px auto;
+}
+
+#formats-table table, th, td {
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+#formats-table th {
+  width: 180px;
+  height: 30px;
+  background-color: #FF0000;
+  color: white;
+}
+
+#formats-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#formats-table input[type=button] {
+  width: 60%;
+  margin: 3px 0 3px;
 }

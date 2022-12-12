@@ -20,7 +20,8 @@ function lookupVideo() {
 
     let options = {
     mode: 'text',
-    pythonPath: ((process.platform === 'win32') ?  process.resourcesPath + '\\venv\\Scripts\\python.exe' : process.resourcesPath + '/venv/bin/python'),
+    // pythonPath: ((process.platform === 'win32') ?  process.resourcesPath + '\\venv\\Scripts\\python.exe' : process.resourcesPath + '/venv/bin/python'),
+    pythonPath: ((process.platform === 'win32') ? 'venv\\Scripts\\python.exe' : 'venv/bin/python'),
     // Get print results in real-time
     pythonOptions: ['-u'],
     // Path to directory of script
@@ -28,7 +29,8 @@ function lookupVideo() {
     args: ['lookup_video', url_input]
     };
 
-    let pyshell = PythonShell.run(__dirname + '/core.py', options, function (err, results) {
+    // let pyshell = PythonShell.run(__dirname + '/core.py', options, function (err, results) {
+    let pyshell = PythonShell.run('core.py', options, function (err, results) {
         if (err) throw err;
         // results is an array consisting of messages collected during execution
         // console.log('results: %j', results);
