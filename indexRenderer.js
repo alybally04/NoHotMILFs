@@ -1,7 +1,17 @@
 const {PythonShell} = require('python-shell')
 
+window.onload = function() {
+    document.querySelector('#loading-icon').style.display = 'none';
+    document.querySelector('#video-details').style.display = 'none';
+    document.querySelector('#formats-table').style.display = 'none';
+};
+
 
 function lookupVideo() {
+    document.querySelector('#loading-icon').style.display = null;
+    document.querySelector('#video-details').style.display = 'none';
+    document.querySelector('#formats-table').style.display = 'none';
+
     const url_input = document.querySelector('#input-field').value
 
     let options = {
@@ -23,10 +33,6 @@ function lookupVideo() {
     pyshell.on('message', function (message) {
         // received a message sent from the Python script (a simple "print" statement)
         let parsedMessage = JSON.parse(message);
-
-        document.querySelector('#video-details').style.visibility = 'visible';
-        document.querySelector('#formats-table').style.visibility = 'visible';
-
         if (parsedMessage.hasOwnProperty('error')) {
 
             document.querySelector('#video-details h3').innerHTML = 'An error has occurred!';
@@ -124,9 +130,13 @@ function lookupVideo() {
     // end the input stream and allow the process to exit
     pyshell.end(function (err, code, signal) {
         if (err) throw err;
-        // console.log('The exit code was: ' + code);
-        // console.log('The exit signal was: ' + signal);
-        // console.log('finished');
+        console.log('The exit code was: ' + code);
+        console.log('The exit signal was: ' + signal);
+        console.log('finished');
+
+        document.querySelector('#loading-icon').style.display = 'none';
+        document.querySelector('#video-details').style.display = null;
+        document.querySelector('#formats-table').style.display = null;
     });
 }
 

@@ -114,7 +114,7 @@ def lookup_video():
         # Dumping JSON to return to renderer process
         video_data = json.dumps({"videoInfo": video_data, "formats": format_entries})
 
-    except yt_dlp.utils.DownloadError:
+    except (yt_dlp.utils.DownloadError, yt_dlp.utils.YoutubeDLError):
         video_data = json.dumps({"error": "DownloadError"})
 
     # return data as string to pass it back to coreInterface.js which will be parsed as json
