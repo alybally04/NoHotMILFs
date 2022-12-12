@@ -117,7 +117,8 @@ function lookupVideo() {
                         cellData = document.createElement('input');
                         cellData.type = 'button';
                         cellData.value = 'Download';
-                        cellData.onclick = downloadVideo();
+                        // noinspection JSValidateTypes,JSVoidFunctionReturnValueUsed
+                        cellData.onclick = downloadVideo(url_input, videoInfo.title, formats[count].formatID, formats[count].fileType);
                     }
 
                     cell.appendChild(cellData)
@@ -144,6 +145,35 @@ function lookupVideo() {
 }
 
 
-function downloadVideo() {
+function downloadVideo(url, title, format_id, file_type) {
+    let options = {
+    mode: 'text',
+    // pythonPath: ((process.platform === 'win32') ?  process.resourcesPath + '\\venv\\Scripts\\python.exe' : process.resourcesPath + '/venv/bin/python'),
+    pythonPath: ((process.platform === 'win32') ? 'venv\\Scripts\\python.exe' : 'venv/bin/python'),
+    // Get print results in real-time
+    pythonOptions: ['-u'],
+    // Path to directory of script
+    scriptPath: '',
+    args: ['download_video', url, title, format_id, file_type]
+    };
 
+    // let pyshell = PythonShell.run(__dirname + '/core.py', options, function (err, results) {
+    let pyshell = PythonShell.run('core.py', options, function (err, results) {
+        if (err) throw err;
+        // results is an array consisting of messages collected during execution
+        // console.log('results: %j', results);
+    });
+
+    pyshell.on('message', function (message) {
+        // received a message sent from the Python script (a simple "print" statement)
+        console.log(message);
+    });
+
+    // end the input stream and allow the process to exit
+    pyshell.end(function (err,code,signal) {
+        if (err) throw err;
+        console.log('The exit code was: ' + code);
+        console.log('The exit signal was: ' + signal);
+        console.log('finished');
+    });
 }

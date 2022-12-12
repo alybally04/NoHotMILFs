@@ -91,6 +91,7 @@ def lookup_video():
             'thumbnail': raw_info['thumbnail']
         }
 
+        audio_file_size = 0
         format_entries = []
         for count, video_format in enumerate(raw_info['formats']):
             if video_format['ext'] != 'mhtml':
@@ -104,11 +105,15 @@ def lookup_video():
                     quality = f"Audio only - {video_format['format_note']}"
 
                 if 'filesize' in video_format and type(video_format['filesize']) is int:
-                    file_size = filesize_readable(video_format['filesize'])
+                    if format_type == 'video':
+                        file_size = filesize_readable(video_format['filesize'] + audio_file_size)
+                    else:
+                        audio_file_size = video_format['filesize']
+                        file_size = filesize_readable(video_format['filesize'])
                 else:
                     file_size = 'UNAVAILABLE'
 
-                entry = {"fileType": file_type, "quality": quality, "fileSize": file_size}
+                entry = {"fileType": file_type, "quality": quality, "fileSize": file_size, "formatID": video_format['format_id']}
                 format_entries.append(entry)
 
         # Dumping JSON to return to renderer process
@@ -121,8 +126,47 @@ def lookup_video():
     return video_data
 
 
+def download_video(url, title, format_id, file_type):
+
+    def progress_hook(response):
+        if response['status'] == 'downloading':
+            downloaded_percent = (response["downloaded_bytes"] * 100) // response["total_bytes"]
+            downloaded_percent /= 100
+
+        elif response['status'] == 'finished':
+            pass
+
+    format_string = f'{format_id}+bestaudio'
+    # format_string = f'{format_id}+bestaudio[ext=m4a]'
+
+    with YoutubeDL({
+        'quiet': True,
+        'noplaylist': True,
+        'cachedir': False,
+        'progress_hooks': [progress_hook],
+        'format': format_string,
+        'merge_output_format': 'mp4',
+        # Begin string with r for raw string and f for f-string
+        'outtmpl': f"{downloads_path}NoHotMILFs - '{title}'.{file_type}",
+        'updatetime': False,
+        'ffmpeg_location': ''
+    }) as ydl:
+
+        ydl.download(url)
+
+    print('All complete!')
+
+
 command = sys.argv[1]
-url_input = sys.argv[2]
 
 if command == 'lookup_video':
+    url_input = sys.argv[2]
     print(lookup_video())
+
+elif command == 'download_video':
+    url = sys.argv[2]
+    title = sys.argv[3]
+    format_id = sys.argv[4]
+    file_type = sys.argv[5]
+
+    print(download_video(url, title, format_id, file_type))
