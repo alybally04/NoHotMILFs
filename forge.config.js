@@ -9,7 +9,7 @@ module.exports = {
       config: {
         authors: 'Evelyn Jones',
         description: 'A GUI for yt-dlp',
-        iconUrl: __dirname + 'assets/icons/icon.ico',
+        iconUrl: __dirname + 'assets/icons/icon',
         // setupIcon: __dirname + 'assets/icons/icon.ico',
       },
     },
