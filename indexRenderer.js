@@ -12,6 +12,9 @@ function lookupVideo() {
     document.querySelector('#video-details').style.display = 'none';
     document.querySelector('#formats-table').style.display = 'none';
 
+    const formatsTableSection = document.querySelector('#formats-table')
+    formatsTableSection.innerHTML = '';
+
     const url_input = document.querySelector('#input-field').value
 
     let options = {
@@ -61,9 +64,6 @@ function lookupVideo() {
             // Generating formats table
             // const table = document.querySelector('#formats-table table')
             // const tableBody = document.querySelector('#formats-table tbody')
-
-            const formatsTableSection = document.querySelector('#formats-table')
-            formatsTableSection.innerHTML = '';
 
             const table = document.createElement("table");
             const tableHead = document.createElement('thead');
