@@ -8,9 +8,11 @@ from yt_dlp import YoutubeDL
 if platform.system() == 'Windows':
     downloads_path = '%USERPROFILE%/Downloads/'
     ffmpeg_path = 'assets/ffmpeg/ffmpegWin/bin'
+    postprocessor_args = []
 else:
     downloads_path = '~/Downloads/'
     ffmpeg_path = 'assets/ffmpeg/ffmpegMac'
+    postprocessor_args = ['-vcodec', 'libx264', '-pix_fmt', 'yuv420p']
 
 
 # Convert bytes into Human-readable format
@@ -143,6 +145,7 @@ def download_video(url, title, format_id, file_type):
 
     with YoutubeDL({
         'ffmpeg_location': ffmpeg_path,
+        'postprocessor_args': postprocessor_args,
         'quiet': True,
         'noplaylist': True,
         'cachedir': False,
