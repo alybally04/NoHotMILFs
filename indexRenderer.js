@@ -20,6 +20,7 @@ function lookupVideo() {
 
     let options = {
     mode: 'text',
+    // TODO: Change this before building
     // pythonPath: ((process.platform === 'win32') ?  process.resourcesPath + '\\venv\\Scripts\\python.exe' : process.resourcesPath + '/venv/bin/python'),
     pythonPath: ((process.platform === 'win32') ? 'venv\\Scripts\\python.exe' : 'venv/bin/python'),
     // Get print results in real-time
@@ -118,7 +119,8 @@ function lookupVideo() {
                         cellData.type = 'button';
                         cellData.value = 'Download';
                         // noinspection JSValidateTypes,JSVoidFunctionReturnValueUsed
-                        cellData.onclick = downloadVideo(url_input, videoInfo.title, formats[count].formatID, formats[count].fileType);
+                        // cellData.onclick = downloadVideo(url_input, videoInfo.title, formats[count].formatID, formats[count].fileType);
+                        cellData.onclick = () => {downloadVideo(url_input, videoInfo.title, formats[count].formatID, formats[count].fileType)};
                     }
 
                     cell.appendChild(cellData)
@@ -148,6 +150,7 @@ function lookupVideo() {
 function downloadVideo(url, title, format_id, file_type) {
     let options = {
     mode: 'text',
+    // TODO: Change this before building
     // pythonPath: ((process.platform === 'win32') ?  process.resourcesPath + '\\venv\\Scripts\\python.exe' : process.resourcesPath + '/venv/bin/python'),
     pythonPath: ((process.platform === 'win32') ? 'venv\\Scripts\\python.exe' : 'venv/bin/python'),
     // Get print results in real-time

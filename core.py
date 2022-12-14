@@ -140,6 +140,7 @@ def download_video(url, title, format_id, file_type):
     # format_string = f'{format_id}+bestaudio[ext=m4a]'
 
     with YoutubeDL({
+        'ffmpeg_location': '',
         'quiet': True,
         'noplaylist': True,
         'cachedir': False,
@@ -149,7 +150,6 @@ def download_video(url, title, format_id, file_type):
         # Begin string with r for raw string and f for f-string
         'outtmpl': f"{downloads_path}NoHotMILFs - '{title}'.{file_type}",
         'updatetime': False,
-        'ffmpeg_location': ''
     }) as ydl:
 
         ydl.download(url)
