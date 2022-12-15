@@ -91,17 +91,6 @@ function lookupVideo() {
             videoInfoSection.appendChild(videoThumbnail)
             videoInfoSection.appendChild(infoDiv)
 
-            /*
-            document.querySelector('#video-details h3').innerHTML = videoInfo.title;
-            document.querySelector('#video-details img').src = videoInfo.thumbnail;
-
-            const videoDetails = document.querySelectorAll('#video-details li')
-
-            videoDetails[0].innerHTML = `Length: ${videoInfo.duration}`;
-            videoDetails[1].innerHTML = `Channel: ${videoInfo.channel}`;
-            videoDetails[2].innerHTML = `Upload Date: ${videoInfo.uploadDate}`;
-             */
-
             // Generating formats table
             const table = document.createElement("table");
             const tableHead = document.createElement('thead');
