@@ -1,4 +1,5 @@
 const {PythonShell} = require('python-shell')
+const querystring = require("querystring");
 let pythonPath;
 
 
@@ -17,12 +18,20 @@ window.onload = function() {
 
 
 function lookupVideo() {
-    // Removing previous video info and formats table sections
-    const videoInfoSection = document.querySelector('#video-details')
-    videoInfoSection.innerHTML = '';
+    // Removing previous video info and formats table sections and creating new ones
+    if (document.querySelector('#video-details') !== null) {
+        document.querySelector('#video-details').remove();
+    }
 
-    const formatsTableSection = document.querySelector('#formats-table')
-    formatsTableSection.innerHTML = '';
+    if (document.querySelector('#formats-table') !== null) {
+        document.querySelector('#formats-table').remove();
+    }
+
+    const videoInfoSection = document.createElement('section');
+    videoInfoSection.id = 'video-details';
+
+    const formatsTableSection = document.createElement('section');
+    formatsTableSection.id = 'formats-table';
 
     // Making the loading symbol visible
     document.querySelector('#loading-icon').style.display = null;
@@ -47,8 +56,8 @@ function lookupVideo() {
     // Receives output from python script via print statements
     pyshell.on('message', function (message) {
         let parsedMessage = JSON.parse(message);
-        if (parsedMessage.hasOwnProperty('error')) {
 
+        if (parsedMessage.hasOwnProperty('error')) {
             document.querySelector('#video-details h3').innerHTML = 'An error has occurred!';
             document.querySelector('#video-details img').src = 'assets/images/imageUnavailable.png';
 
@@ -143,14 +152,19 @@ function lookupVideo() {
                         cellData.onclick = () => {downloadVideo(url_input, videoInfo.title, formats[count].formatID, formats[count].fileType)};
                     }
 
-                    cell.appendChild(cellData)
-                    row.appendChild(cell)
+                    cell.appendChild(cellData);
+                    row.appendChild(cell);
                 }
-                tableBody.appendChild(row)
+                tableBody.appendChild(row);
             }
-            table.appendChild(tableHead)
-            table.appendChild(tableBody)
+            table.appendChild(tableHead);
+            table.appendChild(tableBody);
             formatsTableSection.appendChild(table);
+
+            // Adding video-info and formats-table to UI
+            const main = document.querySelector('main');
+            main.appendChild(videoInfoSection);
+            main.appendChild(formatsTableSection);
         }
     });
 

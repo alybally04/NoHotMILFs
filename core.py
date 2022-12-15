@@ -110,7 +110,8 @@ def lookup_video():
 
                 if 'filesize' in video_format and type(video_format['filesize']) is int:
                     if format_type == 'video':
-                        file_size = filesize_readable(video_format['filesize'] + audio_file_size)
+                        # file_size = filesize_readable(video_format['filesize'] + audio_file_size)
+                        file_size = filesize_readable(video_format['filesize'])
                     else:
                         audio_file_size = video_format['filesize']
                         file_size = filesize_readable(video_format['filesize'])
