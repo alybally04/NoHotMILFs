@@ -70,10 +70,10 @@ function lookupVideo() {
             duration.appendChild(document.createTextNode(`Length: ${videoInfo.duration}`))
 
             const channel = document.createElement('li')
-            channel.appendChild(document.createTextNode(`Length: ${videoInfo.channel}`))
+            channel.appendChild(document.createTextNode(`Channel: ${videoInfo.channel}`))
 
             const uploadDate = document.createElement('li')
-            uploadDate.appendChild(document.createTextNode(`Length: ${videoInfo.uploadDate}`))
+            uploadDate.appendChild(document.createTextNode(`Uploaded on: ${videoInfo.uploadDate}`))
 
             const infoList = document.createElement('ul');
             infoList.appendChild(duration)
