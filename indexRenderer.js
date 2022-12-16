@@ -86,7 +86,15 @@ function lookupVideo() {
 
             // Generating video information section
             const videoTitle = document.createElement('h3');
-            videoTitle.appendChild(document.createTextNode(videoInfo.title));
+            let titleText;
+
+            if (videoInfo.title.length > 85) {
+                titleText = videoInfo.title.substring(0, 80) + '...'
+            } else {
+                titleText = videoInfo.title
+            }
+
+            videoTitle.appendChild(document.createTextNode(titleText));
 
             const infoText = document.createElement('p')
             infoText.innerHTML = `Length: ${videoInfo.duration}<br>Channel: ${videoInfo.channel}<br>Uploaded on: ${videoInfo.uploadDate}`;

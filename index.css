@@ -91,31 +91,34 @@ input[type=button]:active {
   border: black 5px solid;
   border-radius: 0.4rem;
   height: 150px;
-  width: 650px;
+  width: 700px;
   margin: 0 auto 80px auto;
 }
 
 #video-details img {
   height: 150px;
+  min-width: 250px;
   position: fixed;
   right: 58%;
 }
 
 #video-details div {
   margin-left: 45%;
-  margin-top: 17px;
+  height: 150px;
 }
 
 #video-details h3 {
-  margin-top: 0;
+  margin: 8px 0 12px;
+  height: 45px;
 }
 
 #video-details p {
-  background-color: #d9d5d5;
+  background-color: #cbcbcb;
+  line-height: 1.25em;
   overflow-wrap: break-word;
   max-width: max-content;
   margin: 0 auto;
-  padding: 8px 16px;
+  padding: 8px 24px;
   border-radius: 0.4rem;
 }
 
