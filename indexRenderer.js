@@ -50,7 +50,7 @@ function lookupVideo() {
     args: ['lookup_video', url_input]
     };
 
-    let pyshell = PythonShell.run(__dirname + 'core.py', options, function (err, results) {
+    let pyshell = PythonShell.run(__dirname + '/core.py', options, function (err, results) {
         if (err) throw err;
     });
 
