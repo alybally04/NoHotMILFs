@@ -106,17 +106,8 @@ input[type=button]:active {
 }
 
 #video-details h3 {
-  margin-top: 0;
-}
+  margin-top: 8px;
 
-#video-details ul {
-  padding: 0;
-}
-
-#video-details li {
-  display: inline-block;
-  margin: 3px 4px;
-  white-space: nowrap;
 }
 
 #formats-table table {

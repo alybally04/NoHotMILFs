@@ -59,14 +59,26 @@ function lookupVideo() {
         let parsedMessage = JSON.parse(message);
 
         if (parsedMessage.hasOwnProperty('error')) {
-            document.querySelector('#video-details h3').innerHTML = 'An error has occurred!';
-            document.querySelector('#video-details img').src = 'assets/images/imageUnavailable.png';
+            // Generating video information section
+            const videoTitle = document.createElement('h3');
+            videoTitle.appendChild(document.createTextNode('An error has occurred!'));
 
-            const videoDetails = document.querySelectorAll('#video-details li')
+            const infoText = document.createElement('p')
+            infoText.innerHTML = ' <br>Please ensure the URL was entered correctly and try again<br> ';
 
-            videoDetails[0].innerHTML = '';
-            videoDetails[1].innerHTML = 'Please ensure the URL was entered correctly and try again';
-            videoDetails[2].innerHTML = '';
+            const videoThumbnail = document.createElement('img');
+            videoThumbnail.src = 'assets/images/imageUnavailable.png';
+            videoThumbnail.alt = "Youtube video thumbnail"
+
+            const infoDiv = document.createElement('div')
+            infoDiv.appendChild(videoTitle)
+            infoDiv.appendChild(infoText)
+
+            videoInfoSection.appendChild(videoThumbnail)
+            videoInfoSection.appendChild(infoDiv)
+
+            const main = document.querySelector('main');
+            main.appendChild(videoInfoSection);
 
         } else {
             const videoInfo = parsedMessage.videoInfo;
@@ -76,19 +88,8 @@ function lookupVideo() {
             const videoTitle = document.createElement('h3');
             videoTitle.appendChild(document.createTextNode(videoInfo.title));
 
-            const duration = document.createElement('li')
-            duration.appendChild(document.createTextNode(`Length: ${videoInfo.duration}`))
-
-            const channel = document.createElement('li')
-            channel.appendChild(document.createTextNode(`Channel: ${videoInfo.channel}`))
-
-            const uploadDate = document.createElement('li')
-            uploadDate.appendChild(document.createTextNode(`Uploaded on: ${videoInfo.uploadDate}`))
-
-            const infoList = document.createElement('ul');
-            infoList.appendChild(duration)
-            infoList.appendChild(channel)
-            infoList.appendChild(uploadDate)
+            const infoText = document.createElement('p')
+            infoText.innerHTML = `Length: ${videoInfo.duration}<br>Channel: ${videoInfo.channel}<br>Uploaded on: ${videoInfo.uploadDate}`;
 
             const videoThumbnail = document.createElement('img');
             videoThumbnail.src = videoInfo.thumbnail;
@@ -96,7 +97,7 @@ function lookupVideo() {
 
             const infoDiv = document.createElement('div')
             infoDiv.appendChild(videoTitle)
-            infoDiv.appendChild(infoList)
+            infoDiv.appendChild(infoText)
 
             videoInfoSection.appendChild(videoThumbnail)
             videoInfoSection.appendChild(infoDiv)
