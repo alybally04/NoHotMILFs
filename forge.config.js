@@ -5,7 +5,7 @@ module.exports = {
   },
   rebuildConfig: {},
   makers: [
-    /*{
+    {
       name: '@electron-forge/maker-squirrel',
       config: {
         authors: 'Evelyn Jones',
@@ -13,7 +13,7 @@ module.exports = {
         iconUrl: __dirname + '/assets/icons/icon',
         // setupIcon: __dirname + '/assets/icons/icon.ico',
       },
-    },*/
+    },
     {
       name: '@electron-forge/maker-zip',
       platforms: ['darwin', 'win32'],

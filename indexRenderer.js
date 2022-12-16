@@ -64,7 +64,7 @@ function lookupVideo() {
             videoTitle.appendChild(document.createTextNode('An error has occurred!'));
 
             const infoText = document.createElement('p')
-            infoText.innerHTML = ' <br>Please ensure the URL was entered correctly and try again<br> ';
+            infoText.innerHTML = 'Please ensure the URL was entered correctly and try again';
 
             const videoThumbnail = document.createElement('img');
             videoThumbnail.src = 'assets/images/imageUnavailable.png';

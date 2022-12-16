@@ -90,24 +90,33 @@ input[type=button]:active {
   background-color: #f2f2f2;
   border: black 5px solid;
   border-radius: 0.4rem;
-  height: 100px;
+  height: 150px;
   width: 650px;
   margin: 0 auto 80px auto;
 }
 
 #video-details img {
-  height: 100px;
+  height: 150px;
   position: fixed;
-  right: 70%;
+  right: 58%;
 }
 
 #video-details div {
-  margin-left: 32%;
+  margin-left: 45%;
+  margin-top: 17px;
 }
 
 #video-details h3 {
-  margin-top: 8px;
+  margin-top: 0;
+}
 
+#video-details p {
+  background-color: #d9d5d5;
+  overflow-wrap: break-word;
+  max-width: max-content;
+  margin: 0 auto;
+  padding: 8px 16px;
+  border-radius: 0.4rem;
 }
 
 #formats-table table {
