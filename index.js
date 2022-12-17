@@ -1,5 +1,5 @@
 if (require('electron-squirrel-startup')) return;
-const { app, BrowserWindow } = require('electron');
+const { app, shell, BrowserWindow } = require('electron');
 
 
 // this should be placed at top of main.js to handle setup events quickly
@@ -86,6 +86,12 @@ const createWindow = () => {
 
   win.loadFile('index.html');
   win.removeMenu();
+
+  win.webContents.setWindowOpenHandler(({ url }) => {
+  shell.openExternal(url);
+  return { action: 'deny' };
+});
+
   win.webContents.openDevTools()
 }
 

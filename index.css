@@ -85,7 +85,32 @@ input[type=button]:active {
 }
 
 #welcome-section {
+  color: white;
+  background-color: #FF0000;
+  width: 600px;
+  margin: 0 auto;
+  padding: 25px 40px;
+  border-radius: 0.4rem;
+}
 
+#welcome-section a {
+  display: inline;
+  font-size: 1.2rem;
+  text-decoration: none;
+  color: white;
+  background-color: black;
+  border-radius: 0.4rem;
+  margin: 0 8px;
+  padding: 10px 8px;
+}
+
+#welcome-section object {
+  background-color: white;
+  height: 25px;
+  border-radius: 25%;
+  padding: 3px;
+  top: 0.45em;
+  position: relative;
 }
 
 #video-details {
