@@ -71,7 +71,7 @@ function handleSquirrelEvent() {
 }
 
 
-const createWindow = () => {
+const createMainWindow = () => {
   const win = new BrowserWindow({
     width: 1000,
     height: 800,
@@ -86,22 +86,35 @@ const createWindow = () => {
 
   win.loadFile('index.html');
   win.removeMenu();
-
-  win.webContents.setWindowOpenHandler(({ url }) => {
-  shell.openExternal(url);
-  return { action: 'deny' };
-});
-
   win.webContents.openDevTools()
 }
 
 
+const createWelcomeWindow = () => {
+  const win = new BrowserWindow({
+    width: 500,
+    height: 500,
+    resizable: false,
+    minimizable: false,
+    fullscreenable: false,
+  })
+
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
+
+  win.loadFile('welcomePage.html');
+}
+
+
 app.whenReady().then(() => {
-  createWindow();
+  createMainWindow();
+  createWelcomeWindow();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      createMainWindow();
     }
   });
 });
