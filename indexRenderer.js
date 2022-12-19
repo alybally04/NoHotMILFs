@@ -1,5 +1,4 @@
 const {PythonShell} = require('python-shell')
-const querystring = require("querystring");
 let pythonPath;
 
 

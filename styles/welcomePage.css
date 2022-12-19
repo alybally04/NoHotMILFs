@@ -1,25 +1,28 @@
-#welcome-section {
-  color: white;
+body {
   background-color: #FF0000;
-  width: 600px;
+  color: white;
+}
+
+#welcome-section {
+  width: 420px;
   margin: 0 auto;
   padding: 25px 40px;
   border-radius: 0.4rem;
 }
 
 #welcome-section a {
-  display: inline;
   font-size: 1.2rem;
   text-decoration: none;
   color: white;
   background-color: black;
   border-radius: 0.4rem;
-  margin: 0 8px;
+  margin: 80px 8px;
   padding: 10px 8px;
 }
 
 #welcome-section object {
   background-color: white;
+  color: black;
   height: 25px;
   border-radius: 25%;
   padding: 3px;

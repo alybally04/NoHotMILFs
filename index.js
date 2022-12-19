@@ -105,6 +105,7 @@ const createWelcomeWindow = () => {
   });
 
   win.loadFile('pages/welcomePage.html');
+  win.webContents.openDevTools()
 }
 
 
