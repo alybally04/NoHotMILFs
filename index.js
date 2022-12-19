@@ -84,7 +84,7 @@ const createMainWindow = () => {
     }
   });
 
-  win.loadFile('index.html');
+  win.loadFile('pages/index.html');
   win.removeMenu();
   win.webContents.openDevTools()
 }
@@ -104,7 +104,7 @@ const createWelcomeWindow = () => {
     return { action: 'deny' };
   });
 
-  win.loadFile('welcomePage.html');
+  win.loadFile('pages/welcomePage.html');
 }
 
 

@@ -67,7 +67,7 @@ function lookupVideo() {
             infoText.innerHTML = 'Please ensure the URL was entered correctly and try again';
 
             const videoThumbnail = document.createElement('img');
-            videoThumbnail.src = 'assets/images/imageUnavailable.png';
+            videoThumbnail.src = '../assets/images/imageUnavailable.png';
             videoThumbnail.alt = "Youtube video thumbnail"
 
             const infoDiv = document.createElement('div')
