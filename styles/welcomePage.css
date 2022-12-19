@@ -1,17 +1,16 @@
 body {
   background-color: #FF0000;
   color: white;
+  font-weight: bolder;
+  font-size: 1.1rem;
 }
 
-#welcome-section {
-  width: 420px;
-  margin: 0 auto;
-  padding: 25px 40px;
-  border-radius: 0.4rem;
+div {
+  margin-top: 50px;
 }
 
-#welcome-section a {
-  font-size: 1.2rem;
+a {
+  font-size: 1.1em;
   text-decoration: none;
   color: white;
   background-color: black;
@@ -20,12 +19,21 @@ body {
   padding: 10px 8px;
 }
 
-#welcome-section object {
-  background-color: white;
+object {
   color: black;
+  background-color: white;
   height: 25px;
   border-radius: 25%;
   padding: 3px;
   top: 0.45em;
   position: relative;
+}
+
+#dismiss-window {
+  margin-top: 25px;
+  padding: 8px 20px;
+  font-size: 1.1em;
+  color: white;
+  background-color: black;
+  border-radius: 0.4rem;
 }

@@ -5,19 +5,19 @@
         <title>Welcome</title>
         <link rel="stylesheet" href="../styles/global.css">
         <link rel="stylesheet" href="../styles/welcomePage.css">
+        <script src="../welcomePageRenderer.js"></script>
     </head>
     <body>
         <main>
-            <section id="welcome-section">
             <h3>Welcome to NoHotMILFs</h3>
             <p>To get started, enter a YouTube URL into the field above and press "Lookup"</p>
             <p>After the video has been looked up, you can select a format to download the video in</p>
 
-            <div>
+             <div>
                 <a href="https://github.com/alybally04/NoHotMILFs" target="_blank">View on GitHub <object data="../assets/icons/github.svg"></object></a>
                 <br><br>
-            </div>
-          </section>
+                <input type="button" id="dismiss-window" value="Dismiss" onclick="closeWelcome()">
+             </div>
         </main>
     </body>
 </html>

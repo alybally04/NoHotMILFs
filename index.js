@@ -71,8 +71,9 @@ function handleSquirrelEvent() {
 }
 
 
+let mainWindow;  // Make global to set as parent of child elements
 const createMainWindow = () => {
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1000,
     height: 800,
     minWidth: 800,
@@ -84,29 +85,32 @@ const createMainWindow = () => {
     }
   });
 
-  win.loadFile('pages/index.html');
-  win.removeMenu();
-  win.webContents.openDevTools()
+  mainWindow.removeMenu();
+  mainWindow.loadFile('pages/index.html');
+  mainWindow.webContents.openDevTools();
 }
 
 
-const createWelcomeWindow = () => {
-  const win = new BrowserWindow({
-    width: 500,
-    height: 500,
-    resizable: false,
-    minimizable: false,
-    fullscreenable: false,
-  })
+// Create welcome window as a child of the main window
+  const createWelcomeWindow = () => {
+    const welcomewindow = new BrowserWindow({
+      width: 600,
+      height: 600,
+      parent: mainWindow,
+      resizable: false,
+      minimizable: false,
+      fullscreenable: false
+    });
 
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
-    return { action: 'deny' };
-  });
+    welcomewindow.webContents.setWindowOpenHandler(({ url }) => {
+      shell.openExternal(url);
+      return { action: 'deny' };
+    });
 
-  win.loadFile('pages/welcomePage.html');
-  win.webContents.openDevTools()
-}
+    welcomewindow.removeMenu();
+    welcomewindow.loadFile('pages/welcomePage.html');
+    welcomewindow.webContents.openDevTools();
+  }
 
 
 app.whenReady().then(() => {
