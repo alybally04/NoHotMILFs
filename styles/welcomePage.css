@@ -36,4 +36,5 @@ object {
   color: white;
   background-color: black;
   border-radius: 0.4rem;
+  border: none;
 }

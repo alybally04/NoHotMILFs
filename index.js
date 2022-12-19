@@ -109,7 +109,6 @@ const createWelcomeWindow = () => {
     minimizable: false,
     fullscreenable: false,
     webPreferences: {
-      preload: __dirname + '/welcomePagePreload.js',
       nodeIntegration: true,
       contextIsolation: false
     }
@@ -131,7 +130,11 @@ const createWelcomeWindow = () => {
 app.whenReady().then(() => {
   const mainWindow = createMainWindow();
   const welcomeWindow = createWelcomeWindow();
-  welcomeWindow.setParentWindow(mainWindow)
+
+  if (process.platform === 'win32') {
+    // On macOS disabling parent window also disables child windows
+    welcomeWindow.setParentWindow(mainWindow)
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
