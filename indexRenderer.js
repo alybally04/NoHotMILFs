@@ -10,7 +10,8 @@ window.onload = function() {
 
     // For when running in dev environment
     // pythonPath = ((process.platform === 'win32') ? 'venv\\Scripts\\python.exe' : 'venv/bin/python')
-    pythonPath = ((process.platform === 'win32') ? __dirname + '\\venv\\Scripts\\python.exe' : __dirname + '/venv/bin/python')
+    // pythonPath = ((process.platform === 'win32') ? '..\\venv\\Scripts\\python.exe' : '../venv/bin/python')
+    pythonPath = '../venv/bin/python'
 
     // For when building distributable
     // pythonPath = ((process.platform === 'win32') ?  process.resourcesPath + '\\venv\\Scripts\\python.exe' : process.resourcesPath + '/venv/bin/python')
@@ -49,7 +50,7 @@ function lookupVideo() {
     args: ['lookup_video', url_input]
     };
 
-    let pyshell = PythonShell.run(__dirname + '/core.py', options, function (err, results) {
+    let pyshell = PythonShell.run('../core.py', options, function (err, results) {
         if (err) throw err;
     });
 

@@ -1,5 +1,5 @@
 if (require('electron-squirrel-startup')) return;
-const { app, shell, BrowserWindow } = require('electron');
+const { app, shell, BrowserWindow, ipcMain } = require('electron');
 
 
 // this should be placed at top of main.js to handle setup events quickly
@@ -71,7 +71,12 @@ function handleSquirrelEvent() {
 }
 
 
-let mainWindow;  // Make global to set as parent of child elements
+ipcMain.on ("enable-main-window", (event, args) => {
+  mainWindow.setEnabled(true)
+});
+
+
+let mainWindow;
 const createMainWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1000,
@@ -86,36 +91,47 @@ const createMainWindow = () => {
   });
 
   mainWindow.removeMenu();
-  mainWindow.loadFile('pages/index.html');
+  mainWindow.loadFile('pages/index.html')
+
   mainWindow.webContents.openDevTools();
+  mainWindow.setEnabled(false)
+
+  return mainWindow
 }
 
 
 // Create welcome window as a child of the main window
-  const createWelcomeWindow = () => {
-    const welcomewindow = new BrowserWindow({
-      width: 600,
-      height: 600,
-      parent: mainWindow,
-      resizable: false,
-      minimizable: false,
-      fullscreenable: false
-    });
+const createWelcomeWindow = () => {
+  const welcomeWindow = new BrowserWindow({
+    width: 600,
+    height: 600,
+    resizable: false,
+    minimizable: false,
+    fullscreenable: false,
+    webPreferences: {
+      preload: __dirname + '/welcomePagePreload.js',
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
 
-    welcomewindow.webContents.setWindowOpenHandler(({ url }) => {
-      shell.openExternal(url);
-      return { action: 'deny' };
-    });
+  welcomeWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
 
-    welcomewindow.removeMenu();
-    welcomewindow.loadFile('pages/welcomePage.html');
-    welcomewindow.webContents.openDevTools();
-  }
+  welcomeWindow.removeMenu();
+  welcomeWindow.loadFile('pages/welcomePage.html');
+  welcomeWindow.webContents.openDevTools();
+
+  return welcomeWindow
+}
 
 
 app.whenReady().then(() => {
-  createMainWindow();
-  createWelcomeWindow();
+  const mainWindow = createMainWindow();
+  const welcomeWindow = createWelcomeWindow();
+  welcomeWindow.setParentWindow(mainWindow)
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
