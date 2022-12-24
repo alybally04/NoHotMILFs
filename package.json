@@ -29,6 +29,7 @@
     "electron": "^22.0.0"
   },
   "dependencies": {
+    "electron-json-storage": "^4.6.0",
     "electron-squirrel-startup": "^1.0.0",
     "python-shell": "^3.0.1"
   }

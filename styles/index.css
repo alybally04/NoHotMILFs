@@ -1,7 +1,7 @@
 header {
   width: 100%;
   margin-bottom: 80px;
-  background-color: #FF0000;
+  background-color: #00FFFE;
 }
 
 header img {
@@ -16,8 +16,7 @@ input[type=button] {
   border: none;
   padding-top: 5px;
   padding-bottom: 5px;
-  color: white;
-  background-color: #FF0000;
+  background-color: #00FFFE;
   transition: transform 0.075s;
 }
 
@@ -34,8 +33,7 @@ input[type=button]:active {
 }
 
 #url-input label {
-  color: white;
-  background-color: #FF0000;
+  background-color: #00FFFE;
   padding: 2.7vh 1vh 2.8vh 1vh;
   font-weight: bold;
   font-size: 115%;
@@ -65,8 +63,8 @@ input[type=button]:active {
 #loading-icon {
   border: 12px solid #f3f3f3;
   border-radius: 50%;
-  border-top: 12px solid #FF0000;
-  border-bottom: 12px solid #FF0000;
+  border-top: 12px solid #00FFFE;
+  border-bottom: 12px solid #00FFFE;
   width: 100px;
   height: 100px;
   animation: spin 1.2s linear infinite;
@@ -128,8 +126,7 @@ input[type=button]:active {
 #formats-table th {
   width: 180px;
   height: 30px;
-  background-color: #FF0000;
-  color: white;
+  background-color: #00FFFE;
 }
 
 #formats-table tr:nth-child(even) {

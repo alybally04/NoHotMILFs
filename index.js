@@ -1,5 +1,6 @@
 if (require('electron-squirrel-startup')) return;
 const { app, shell, BrowserWindow, ipcMain } = require('electron');
+const storage = require('electron-json-storage');
 
 
 // this should be placed at top of main.js to handle setup events quickly
