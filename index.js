@@ -72,9 +72,11 @@ function handleSquirrelEvent() {
 }
 
 
+/*
 ipcMain.on ("enable-main-window", (event, args) => {
   mainWindow.setEnabled(true)
 });
+*/
 
 
 let mainWindow;
@@ -95,8 +97,6 @@ const createMainWindow = () => {
   mainWindow.loadFile('pages/index.html')
 
   mainWindow.webContents.openDevTools();
-  mainWindow.setEnabled(false)
-
   return mainWindow
 }
 
@@ -122,7 +122,7 @@ const createWelcomeWindow = () => {
 
   welcomeWindow.removeMenu();
   welcomeWindow.loadFile('pages/welcomePage.html');
-  welcomeWindow.webContents.openDevTools();
+  // welcomeWindow.webContents.openDevTools();
 
   return welcomeWindow
 }
@@ -131,6 +131,11 @@ const createWelcomeWindow = () => {
 app.whenReady().then(() => {
   const mainWindow = createMainWindow();
   const welcomeWindow = createWelcomeWindow();
+
+  mainWindow.setEnabled(false)
+  welcomeWindow.on('close', function() {
+    mainWindow.setEnabled(true)
+  })
 
   if (process.platform === 'win32') {
     // On macOS disabling parent window also disables child windows
