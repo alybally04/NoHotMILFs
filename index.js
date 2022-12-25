@@ -130,9 +130,9 @@ const createWelcomeWindow = () => {
 
 app.whenReady().then(() => {
   const mainWindow = createMainWindow();
-  const welcomeWindow = createWelcomeWindow();
+  // mainWindow.setEnabled(false)
+  // const welcomeWindow = createWelcomeWindow();
 
-  mainWindow.setEnabled(false)
   welcomeWindow.on('close', function() {
     mainWindow.setEnabled(true)
   })

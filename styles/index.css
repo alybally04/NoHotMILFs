@@ -92,12 +92,11 @@ input[type=button]:active {
   height: 150px;
   min-width: 250px;
   position: fixed;
-  right: 58%;
+  left: 30px;
 }
 
 #video-details div {
-  margin-left: 45%;
-  height: 150px;
+  margin-left: 40%;
 }
 
 #video-details h3 {
@@ -137,4 +136,23 @@ input[type=button]:active {
 #formats-table input[type=button] {
   width: 60%;
   margin: 3px 0 3px;
+}
+
+#current-download {
+  margin-bottom: 160px;
+}
+
+#progress-bar {
+  border-radius: 1.2rem;
+  margin: 20px auto 0;
+  width: 500px;
+  background-color: lightgray;
+}
+
+#progress-bar div {
+  border-radius: 1.2rem;
+  background-color: #00FFFE;
+  height: min-content;
+  padding: 5px 0;
+  width: 0;
 }

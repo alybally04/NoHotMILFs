@@ -9,9 +9,7 @@ window.onload = function() {
     // TODO: Change this before building!
 
     // For when running in dev environment
-    // pythonPath = ((process.platform === 'win32') ? 'venv\\Scripts\\python.exe' : 'venv/bin/python')
-    // pythonPath = ((process.platform === 'win32') ? '..\\venv\\Scripts\\python.exe' : '../venv/bin/python')
-    pythonPath = 'venv/bin/python'
+    pythonPath = ((process.platform === 'win32') ? 'venv\\Scripts\\python.exe' : 'venv/bin/python')
 
     // For when building distributable
     // pythonPath = ((process.platform === 'win32') ?  process.resourcesPath + '\\venv\\Scripts\\python.exe' : process.resourcesPath + '/venv/bin/python')
@@ -26,6 +24,10 @@ function lookupVideo() {
 
     if (document.querySelector('#formats-table') !== null) {
         document.querySelector('#formats-table').remove();
+    }
+
+    if (document.querySelector('#current-download') !== null) {
+        document.querySelector('#current-download').remove();
     }
 
     const videoInfoSection = document.createElement('section');
@@ -159,7 +161,7 @@ function lookupVideo() {
                         cellData.value = 'Download';
                         // noinspection JSValidateTypes,JSVoidFunctionReturnValueUsed
                         // cellData.onclick = downloadVideo(url_input, videoInfo.title, formats[count].formatID, formats[count].fileType);
-                        cellData.onclick = () => {downloadVideo(url_input, videoInfo.title, formats[count].formatID, formats[count].fileType)};
+                        cellData.onclick = () => {downloadVideo(url_input, videoInfo.title, formats[count].formatID, formats[count].fileType, formats[count].fileSize)};
                     }
 
                     cell.appendChild(cellData);
@@ -191,7 +193,39 @@ function lookupVideo() {
 }
 
 
-function downloadVideo(url, title, format_id, file_type) {
+function downloadVideo(url, title, formatId, fileType, fileSize) {
+    const formatsTableSection = document.querySelector('#formats-table');
+    formatsTableSection.style.display = 'none';
+
+    const currentDownloadSection = document.createElement('section');
+    currentDownloadSection.id = 'current-download';
+
+    const currentDownloadTitle = document.createElement('h3');
+    currentDownloadTitle.innerHTML = `Downloading&nbsp;&nbsp;—&nbsp;&nbsp;${title}`;
+    currentDownloadSection.appendChild(currentDownloadTitle);
+
+    let downloadProgressInfo = document.createElement('p');
+    if (fileSize === 'UNAVAILABLE') {
+        downloadProgressInfo.innerHTML = `Download size unavailable&nbsp;&nbsp;—&nbsp;&nbsp;ETA: Calculating...`;
+    } else {
+        downloadProgressInfo.innerHTML = `Downloaded 0 ${fileSize.substring(fileSize.length - 2)} of ${fileSize}&nbsp;&nbsp;—&nbsp;&nbsp;ETA: Calculating...`;
+    }
+    currentDownloadSection.appendChild(downloadProgressInfo);
+
+    let progressBarContainer = document.createElement('div');
+    progressBarContainer.id = 'progress-bar';
+
+    let progressBar = document.createElement('div');
+    progressBar.innerText = '0%';
+    progressBarContainer.appendChild(progressBar)
+
+    currentDownloadSection.appendChild(progressBarContainer);
+
+    const main = document.querySelector('main');
+    main.appendChild(currentDownloadSection);
+
+    return
+
     let options = {
     mode: 'text',
     pythonPath: pythonPath,
@@ -199,7 +233,7 @@ function downloadVideo(url, title, format_id, file_type) {
     pythonOptions: ['-u'],
     // Path to directory of script
     scriptPath: '',
-    args: ['download_video', url, title, format_id, file_type]
+    args: ['download_video', url, title, formatId, fileType]
     };
 
     // let pyshell = PythonShell.run(__dirname + '/core.py', options, function (err, results) {
@@ -220,5 +254,7 @@ function downloadVideo(url, title, format_id, file_type) {
         console.log('The exit code was: ' + code);
         console.log('The exit signal was: ' + signal);
         console.log('finished');
+
+        document.querySelector('#current-download').remove();
     });
 }
