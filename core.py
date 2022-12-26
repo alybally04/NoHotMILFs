@@ -135,15 +135,7 @@ def download_video():
     def progress_hook(response):
         if response['status'] == 'downloading':
             print(response)
-            # downloaded_percent = (response["downloaded_bytes"] * 100) // response["total_bytes"]
 
-            # progress_data = json.dumps({"eta": response['eta'], "downloadedPercent": downloaded_percent})
-            # Add at symbol to parse json from ytdl spam
-            # print(f'@{progress_data}')
-
-        # elif response['status'] == 'finished':
-
-    # format_string = f'{format_id}+bestaudio'
     format_string = f'{format_id}+bestaudio[ext=m4a]'
 
     with YoutubeDL({

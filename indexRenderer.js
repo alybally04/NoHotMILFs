@@ -214,8 +214,7 @@ function downloadVideo(url, title, formatId, fileType, fileSize) {
 
     let progressBar = document.createElement('div');
     progressBar.innerText = '0%';
-    progressBarContainer.appendChild(progressBar)
-
+    progressBarContainer.appendChild(progressBar);
     currentDownloadSection.appendChild(progressBarContainer);
 
     const main = document.querySelector('main');
@@ -236,26 +235,31 @@ function downloadVideo(url, title, formatId, fileType, fileSize) {
         if (err) throw err;
     });
 
+    // Count number of downloads (First is video, then audio)
+    let downloadCount = 0;
+    // received a message sent from the Python script (a simple "print" statement)s
     pyshell.on('message', function (message) {
-        // received a message sent from the Python script (a simple "print" statement)
         message = message.split('{')[0];
         message = message.split(']')[1];
-        console.log(message);
-
-        document.querySelector('#current-download p').innerText = `Downloaded ${message}`;
-        /*
-        message = message.split('@');
-
-        let parsedMessage;
-
-        if (message === undefined || message[1] === undefined) {
-            parsedMessage = null;
-        } else {
-            parsedMessage = JSON.parse(message[1]);
+        const progressPercentage = message.split('%')[0].trim();
+        if (progressPercentage === '100.0') {
+            downloadCount += 1;
         }
 
-        console.log(parsedMessage);
-        */
+        if (downloadCount === 0) {
+            document.querySelector('#current-download p').innerHTML =
+                `Downloading Video&nbsp;&nbsp;—&nbsp;&nbsp;${message.substring(0, message.length - 9)}&nbsp;&nbsp;—&nbsp;&nbsp;${message.substring(message.length - 9)}`;
+        } else if (downloadCount === 1) {
+            document.querySelector('#current-download p').innerHTML =
+                `Downloading Audio&nbsp;&nbsp;—&nbsp;&nbsp;${message.substring(0, message.length - 9)}&nbsp;&nbsp;—&nbsp;&nbsp;${message.substring(message.length - 9)}`;
+        } else {
+            document.querySelector('#current-download p').innerHTML = 'Exporting download...';
+            progressBarContainer.remove();
+            document.querySelector('#loading-icon').style.display = null;
+        }
+
+        progressBar.innerText = progressPercentage + '%';
+        progressBar.style.width = progressPercentage + '%';
     });
 
     // end the input stream and allow the process to exit
@@ -266,5 +270,8 @@ function downloadVideo(url, title, formatId, fileType, fileSize) {
         console.log('finished');
 
         document.querySelector('#current-download').remove();
+        // Making the loading symbol visible
+        document.querySelector('#loading-icon').style.display = null;
+        formatsTableSection.style.display = null;
     });
 }
