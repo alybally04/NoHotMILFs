@@ -58,7 +58,7 @@ function lookupVideo() {
 
     // Receives output from python script via print statements
     pyshell.on('message', function (message) {
-        let parsedMessage = JSON.parse(message);
+        const parsedMessage = JSON.parse(message);
 
         if (parsedMessage.hasOwnProperty('error')) {
             // Generating video information section
@@ -205,11 +205,8 @@ function downloadVideo(url, title, formatId, fileType, fileSize) {
     currentDownloadSection.appendChild(currentDownloadTitle);
 
     let downloadProgressInfo = document.createElement('p');
-    if (fileSize === 'UNAVAILABLE') {
-        downloadProgressInfo.innerHTML = `Download size unavailable&nbsp;&nbsp;—&nbsp;&nbsp;ETA: Calculating...`;
-    } else {
-        downloadProgressInfo.innerHTML = `Downloaded 0 ${fileSize.substring(fileSize.length - 2)} of ${fileSize}&nbsp;&nbsp;—&nbsp;&nbsp;ETA: Calculating...`;
-    }
+    // downloadProgressInfo.innerText = `Downloaded 0 ${fileSize.substring(fileSize.length - 2)} of ${fileSize}&nbsp;&nbsp;—&nbsp;&nbsp;ETA: Calculating...`;
+    downloadProgressInfo.innerText = 'Beginning download...';
     currentDownloadSection.appendChild(downloadProgressInfo);
 
     let progressBarContainer = document.createElement('div');
@@ -224,8 +221,6 @@ function downloadVideo(url, title, formatId, fileType, fileSize) {
     const main = document.querySelector('main');
     main.appendChild(currentDownloadSection);
 
-    return
-
     let options = {
     mode: 'text',
     pythonPath: pythonPath,
@@ -239,13 +234,28 @@ function downloadVideo(url, title, formatId, fileType, fileSize) {
     // let pyshell = PythonShell.run(__dirname + '/core.py', options, function (err, results) {
     let pyshell = PythonShell.run('core.py', options, function (err, results) {
         if (err) throw err;
-        // results is an array consisting of messages collected during execution
-        // console.log('results: %j', results);
     });
 
     pyshell.on('message', function (message) {
         // received a message sent from the Python script (a simple "print" statement)
+        message = message.split('{')[0];
+        message = message.split(']')[1];
         console.log(message);
+
+        document.querySelector('#current-download p').innerText = `Downloaded ${message}`;
+        /*
+        message = message.split('@');
+
+        let parsedMessage;
+
+        if (message === undefined || message[1] === undefined) {
+            parsedMessage = null;
+        } else {
+            parsedMessage = JSON.parse(message[1]);
+        }
+
+        console.log(parsedMessage);
+        */
     });
 
     // end the input stream and allow the process to exit

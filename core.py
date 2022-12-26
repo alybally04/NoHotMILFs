@@ -84,7 +84,7 @@ def lookup_video():
         with YoutubeDL({'quiet': True, 'noplaylist': True, 'cachedir': False}) as ydl:
             raw_info = ydl.extract_info(url_input, download=False)
 
-        video_data = {
+        video_info = {
             # Keys in camelCase for use in JavaScriptu
             'title': raw_info['title'],
             'channel': raw_info['uploader'],
@@ -122,32 +122,34 @@ def lookup_video():
                 format_entries.append(entry)
 
         # Dumping JSON to return to renderer process
-        video_data = json.dumps({"videoInfo": video_data, "formats": format_entries})
+        video_data = json.dumps({"videoInfo": video_info, "formats": format_entries})
 
     except (yt_dlp.utils.DownloadError, yt_dlp.utils.YoutubeDLError):
         video_data = json.dumps({"error": "DownloadError"})
 
-    # return data as string to pass it back to coreInterface.js which will be parsed as json
-    return video_data
+    # print data as string to pass it back to renderer process which will parsed it as json
+    print(video_data)
 
 
-def download_video(url, title, format_id, file_type):
-
+def download_video():
     def progress_hook(response):
         if response['status'] == 'downloading':
-            downloaded_percent = (response["downloaded_bytes"] * 100) // response["total_bytes"]
-            downloaded_percent /= 100
+            print(response)
+            # downloaded_percent = (response["downloaded_bytes"] * 100) // response["total_bytes"]
 
-        elif response['status'] == 'finished':
-            pass
+            # progress_data = json.dumps({"eta": response['eta'], "downloadedPercent": downloaded_percent})
+            # Add at symbol to parse json from ytdl spam
+            # print(f'@{progress_data}')
+
+        # elif response['status'] == 'finished':
 
     # format_string = f'{format_id}+bestaudio'
     format_string = f'{format_id}+bestaudio[ext=m4a]'
 
     with YoutubeDL({
+        'quiet': True,
         'ffmpeg_location': ffmpeg_path,
         'postprocessor_args': postprocessor_args,
-        'quiet': True,
         'noplaylist': True,
         'cachedir': False,
         'progress_hooks': [progress_hook],
@@ -160,14 +162,12 @@ def download_video(url, title, format_id, file_type):
 
         ydl.download(url)
 
-    print('All complete!')
-
 
 command = sys.argv[1]
 
 if command == 'lookup_video':
     url_input = sys.argv[2]
-    print(lookup_video())
+    lookup_video()
 
 elif command == 'download_video':
     url = sys.argv[2]
@@ -175,4 +175,4 @@ elif command == 'download_video':
     format_id = sys.argv[4]
     file_type = sys.argv[5]
 
-    print(download_video(url, title, format_id, file_type))
+    download_video()
