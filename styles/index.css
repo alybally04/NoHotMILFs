@@ -53,6 +53,11 @@ input[type=button]:active {
   outline-width: 0;
 }
 
+#input-field:disabled {
+  background-color: white;
+  pointer-events: none;
+}
+
 #search-button {
   margin-left: 15px;
   padding: 15px 25px;
@@ -61,7 +66,11 @@ input[type=button]:active {
   font-size: 110%;
 }
 
-#loading-icon {
+#search-button:disabled {
+  pointer-events: none;
+}
+
+.loading-icon {
   border: 12px solid #f3f3f3;
   border-radius: 50%;
   border-top: 12px solid #00FFFE;
@@ -114,6 +123,17 @@ input[type=button]:active {
   border-radius: 0.4rem;
 }
 
+#success-message {
+  margin: 0 auto 20px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  background-color: #f2f2f2;
+  color: #00bc00;
+  width: 700px;
+  padding: 12px 8px;
+  border-radius: 0.3rem;
+}
+
 #formats-table table {
   margin: 0 auto 80px auto;
 }
@@ -139,7 +159,7 @@ input[type=button]:active {
 }
 
 #current-download {
-  margin-bottom: 160px;
+  margin-bottom: 80px;
 }
 
 #progress-bar {

@@ -1,33 +1,46 @@
 const {PythonShell} = require('python-shell')
 let pythonPath;
 
-
-// Setting containers to be invisible at launch
-window.onload = function() {
-    document.querySelector('#loading-icon').style.display = 'none';
-
+let lookupButton;
+let inputField;
+window.onload = function () {
     // TODO: Change this before building!
-
     // For when running in dev environment
-    pythonPath = ((process.platform === 'win32') ? 'venv\\Scripts\\python.exe' : 'venv/bin/python')
+    pythonPath = ((process.platform === 'win32') ? 'venv\\Scripts\\python.exe' : 'venv/bin/python');
 
     // For when building distributable
     // pythonPath = ((process.platform === 'win32') ?  process.resourcesPath + '\\venv\\Scripts\\python.exe' : process.resourcesPath + '/venv/bin/python')
-};
+
+    lookupButton = document.querySelector('#search-button');
+    inputField = document.querySelector('#input-field');
+
+    document.querySelector('#url-input').addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            document.querySelector('#search-button').click();
+        }
+    });
+}
+
+
+// Disable or enable all inputs on UI
+// Provide true or false as args
+function disableInputs (bool) {
+    lookupButton.disabled = bool;
+    inputField.disabled = bool;
+}
 
 
 function lookupVideo() {
+    disableInputs(true);
+
     // Removing previous video info and formats table sections and creating new ones
-    if (document.querySelector('#video-details') !== null) {
-        document.querySelector('#video-details').remove();
-    }
-
-    if (document.querySelector('#formats-table') !== null) {
-        document.querySelector('#formats-table').remove();
-    }
-
-    if (document.querySelector('#current-download') !== null) {
-        document.querySelector('#current-download').remove();
+    const elementsToRemove = ['#video-details', '#success-message', '#formats-table', '#current-download']
+    for (let i = 0; i < elementsToRemove.length; i++) {
+        const currentElement = document.querySelector(elementsToRemove[i])
+        if (currentElement !== null) {
+            currentElement.remove();
+        }
     }
 
     const videoInfoSection = document.createElement('section');
@@ -36,8 +49,13 @@ function lookupVideo() {
     const formatsTableSection = document.createElement('section');
     formatsTableSection.id = 'formats-table';
 
-    // Making the loading symbol visible
-    document.querySelector('#loading-icon').style.display = null;
+    const main = document.querySelector('main');
+
+    // Adding loading icon
+    const loadingIcon = document.createElement('div');
+    loadingIcon.className = 'loading-icon';
+    main.appendChild(loadingIcon);
+
 
     // Getting the user input
     const url_input = document.querySelector('#input-field').value
@@ -174,7 +192,6 @@ function lookupVideo() {
             formatsTableSection.appendChild(table);
 
             // Adding video-info and formats-table to UI
-            const main = document.querySelector('main');
             main.appendChild(videoInfoSection);
             main.appendChild(formatsTableSection);
         }
@@ -188,12 +205,19 @@ function lookupVideo() {
         console.log('finished');
 
         // Removing loading icon once loading is finished
-        document.querySelector('#loading-icon').style.display = 'none';
+        loadingIcon.remove();
+        disableInputs(false);
     });
 }
 
 
 function downloadVideo(url, title, formatId, fileType, fileSize) {
+    disableInputs(true);
+
+    if (document.querySelector('#success-message') !== null) {
+        document.querySelector('#success-message').remove();
+    }
+
     const formatsTableSection = document.querySelector('#formats-table');
     formatsTableSection.style.display = 'none';
 
@@ -237,6 +261,8 @@ function downloadVideo(url, title, formatId, fileType, fileSize) {
 
     // Count number of downloads (First is video, then audio)
     let downloadCount = 0;
+    const loadingIcon = document.createElement('div');
+    loadingIcon.className = 'loading-icon';
     // received a message sent from the Python script (a simple "print" statement)s
     pyshell.on('message', function (message) {
         message = message.split('{')[0];
@@ -255,7 +281,7 @@ function downloadVideo(url, title, formatId, fileType, fileSize) {
         } else {
             document.querySelector('#current-download p').innerHTML = 'Exporting download...';
             progressBarContainer.remove();
-            document.querySelector('#loading-icon').style.display = null;
+            main.appendChild(loadingIcon);
         }
 
         progressBar.innerText = progressPercentage + '%';
@@ -269,9 +295,16 @@ function downloadVideo(url, title, formatId, fileType, fileSize) {
         console.log('The exit signal was: ' + signal);
         console.log('finished');
 
-        document.querySelector('#current-download').remove();
-        // Making the loading symbol visible
-        document.querySelector('#loading-icon').style.display = null;
+        currentDownloadSection.remove();
+        loadingIcon.remove();
+
+        const successMessage = document.createElement('p');
+        successMessage.innerText = 'Video Downloaded Successfully! - Available in your Downloads folder';
+        successMessage.id = 'success-message';
+        // main.appendChild(successMessage);
+        main.insertBefore(successMessage, main.children[2]);
+
         formatsTableSection.style.display = null;
+        disableInputs(false);
     });
 }
