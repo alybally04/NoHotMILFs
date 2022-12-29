@@ -1,11 +1,9 @@
-// const {ipcRenderer} = require('electron');
 const storage = require('electron-json-storage');
-const path = require('path');
+const {ipcRenderer} = require('electron');
 
 
-function closeWelcome() {
-    storage.setDataPath(path.join(__dirname, '..'));
-    console.log(storage.getDataPath())
-    // ipcRenderer.send ("enable-main-window");
-    window.close();
-}
+window.addEventListener("beforeunload", (event) => {
+    if (document.querySelector('#disable-welcome').checked === true) {
+        ipcRenderer.send("disableWelcome");
+    }
+});

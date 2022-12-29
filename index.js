@@ -1,6 +1,7 @@
 if (require('electron-squirrel-startup')) return;
 const { app, shell, BrowserWindow, ipcMain } = require('electron');
 const storage = require('electron-json-storage');
+const fs = require('fs')
 
 
 // this should be placed at top of main.js to handle setup events quickly
@@ -72,11 +73,18 @@ function handleSquirrelEvent() {
 }
 
 
-/*
-ipcMain.on ("enable-main-window", (event, args) => {
-  mainWindow.setEnabled(true)
+ipcMain.on ("disableWelcome", (event) => {
+  storage.setDataPath(__dirname)
+  let userData;
+
+  storage.get('userSettings', function (err, data) {
+    if (err) throw err;
+    userData =  data;
+  });
+
+  userData['disableWelcome'] = true;
+  storage.set('userSettings', userData, function (err) {if (err) throw err;})
 });
-*/
 
 
 let mainWindow;
@@ -95,8 +103,8 @@ const createMainWindow = () => {
 
   mainWindow.removeMenu();
   mainWindow.loadFile('pages/index.html')
-
   mainWindow.webContents.openDevTools();
+
   return mainWindow
 }
 
@@ -122,24 +130,42 @@ const createWelcomeWindow = () => {
 
   welcomeWindow.removeMenu();
   welcomeWindow.loadFile('pages/welcomePage.html');
-  // welcomeWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   return welcomeWindow
 }
 
 
 app.whenReady().then(() => {
+  storage.setDataPath(__dirname);
+  let userData;
+
+  storage.get('userSettings', function (err, data) {
+    if (err) throw err;
+    userData = data;
+  });
+
+  if (fs.existsSync('userSettings.json') === false) {
+    console.log('gen1')
+    let templateUserData = {"disableWelcome": false};
+    userData = templateUserData;
+    storage.set('userSettings', templateUserData, function (err) {if (err) throw err});
+  }
+
   const mainWindow = createMainWindow();
-  // mainWindow.setEnabled(false)
-  // const welcomeWindow = createWelcomeWindow();
+  mainWindow.setEnabled(false)
 
-  welcomeWindow.on('close', function() {
-    mainWindow.setEnabled(true)
-  })
+  if (userData['disableWelcome'] === false) {
+    const welcomeWindow = createWelcomeWindow();
 
-  if (process.platform === 'win32') {
-    // On macOS disabling parent window also disables child windows
-    welcomeWindow.setParentWindow(mainWindow)
+    welcomeWindow.on('close', function() {
+      mainWindow.setEnabled(true)
+    })
+
+    if (process.platform === 'win32') {
+      // On macOS disabling parent window also disables child windows
+      welcomeWindow.setParentWindow(mainWindow)
+    }
   }
 
   app.on('activate', () => {
