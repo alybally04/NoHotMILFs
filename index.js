@@ -71,7 +71,7 @@ function handleSquirrelEvent() {
   }
 }
 
-
+// TODO: remove old userData.json from appdatadir on install 
 // On MacOS process.env.APPDATA returns undefined, which is a falsy value (is equivalent to "false")
 const appDataDir = process.env.APPDATA ? process.env.APPDATA + '/NoHotMILFs/' : process.env.HOME + '/Library/Preferences/NoHotMILFs/'
 if (fs.existsSync(appDataDir) === false) {
