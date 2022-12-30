@@ -1,4 +1,3 @@
-const storage = require('electron-json-storage');
 const {ipcRenderer} = require('electron');
 
 

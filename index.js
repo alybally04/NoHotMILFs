@@ -1,6 +1,5 @@
 if (require('electron-squirrel-startup')) return;
 const { app, shell, BrowserWindow, ipcMain } = require('electron');
-const storage = require('electron-json-storage');
 const fs = require('fs')
 
 
@@ -73,17 +72,24 @@ function handleSquirrelEvent() {
 }
 
 
+// On MacOS process.env.APPDATA returns undefined, which is a falsy value (is equivalent to "false")
+const appDataDir = process.env.APPDATA ? process.env.APPDATA + '/NoHotMILFs/' : process.env.HOME + '/Library/Preferences/NoHotMILFs/'
+if (fs.existsSync(appDataDir) === false) {
+  fs.mkdirSync(appDataDir);
+}
+
+
 ipcMain.on ("disableWelcome", (event) => {
-  storage.setDataPath(__dirname)
-  let userData;
-
-  storage.get('userSettings', function (err, data) {
+  fs.readFile(appDataDir + 'userData.json', (err, data) => {
     if (err) throw err;
-    userData =  data;
-  });
 
-  userData['disableWelcome'] = true;
-  storage.set('userSettings', userData, function (err) {if (err) throw err;})
+    let userData = JSON.parse(data);
+    userData.welcomeDisabled = true;
+
+    fs.writeFile(appDataDir + 'userData.json', JSON.stringify(userData), (err) => {
+      if (err) throw err;
+    });
+  });
 });
 
 
@@ -137,25 +143,18 @@ const createWelcomeWindow = () => {
 
 
 app.whenReady().then(() => {
-  storage.setDataPath(__dirname);
   let userData;
-
-  storage.get('userSettings', function (err, data) {
-    if (err) throw err;
-    userData = data;
-  });
-
-  if (fs.existsSync('userSettings.json') === false) {
-    console.log('gen1')
-    let templateUserData = {"disableWelcome": false};
-    userData = templateUserData;
-    storage.set('userSettings', templateUserData, function (err) {if (err) throw err});
+  if (fs.existsSync(appDataDir + 'userData.json')) {
+    userData = JSON.parse(fs.readFileSync(appDataDir + 'userData.json', 'utf8'));
+  } else {
+    userData = {welcomeDisabled: false};
+    fs.writeFileSync(appDataDir + 'userData.json', JSON.stringify(userData));
   }
 
   const mainWindow = createMainWindow();
-  mainWindow.setEnabled(false)
 
-  if (userData['disableWelcome'] === false) {
+  if (userData.welcomeDisabled === false) {
+    mainWindow.setEnabled(false)
     const welcomeWindow = createWelcomeWindow();
 
     welcomeWindow.on('close', function() {
