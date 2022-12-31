@@ -1,6 +1,6 @@
 if (require('electron-squirrel-startup')) return;
 const { app, shell, BrowserWindow, ipcMain } = require('electron');
-const storage = require('electron-json-storage');
+const fs = require('fs')
 
 
 // this should be placed at top of main.js to handle setup events quickly
@@ -71,12 +71,26 @@ function handleSquirrelEvent() {
   }
 }
 
+// TODO: remove old userData.json from appdatadir on install 
+// On MacOS process.env.APPDATA returns undefined, which is a falsy value (is equivalent to "false")
+const appDataDir = process.env.APPDATA ? process.env.APPDATA + '/NoHotMILFs/' : process.env.HOME + '/Library/Preferences/NoHotMILFs/'
+if (fs.existsSync(appDataDir) === false) {
+  fs.mkdirSync(appDataDir);
+}
 
-/*
-ipcMain.on ("enable-main-window", (event, args) => {
-  mainWindow.setEnabled(true)
+
+ipcMain.on ("disableWelcome", (event) => {
+  fs.readFile(appDataDir + 'userData.json', (err, data) => {
+    if (err) throw err;
+
+    let userData = JSON.parse(data);
+    userData.welcomeDisabled = true;
+
+    fs.writeFile(appDataDir + 'userData.json', JSON.stringify(userData), (err) => {
+      if (err) throw err;
+    });
+  });
 });
-*/
 
 
 let mainWindow;
@@ -95,8 +109,8 @@ const createMainWindow = () => {
 
   mainWindow.removeMenu();
   mainWindow.loadFile('pages/index.html')
-
   mainWindow.webContents.openDevTools();
+
   return mainWindow
 }
 
@@ -122,24 +136,35 @@ const createWelcomeWindow = () => {
 
   welcomeWindow.removeMenu();
   welcomeWindow.loadFile('pages/welcomePage.html');
-  // welcomeWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   return welcomeWindow
 }
 
 
 app.whenReady().then(() => {
+  let userData;
+  if (fs.existsSync(appDataDir + 'userData.json')) {
+    userData = JSON.parse(fs.readFileSync(appDataDir + 'userData.json', 'utf8'));
+  } else {
+    userData = {welcomeDisabled: false};
+    fs.writeFileSync(appDataDir + 'userData.json', JSON.stringify(userData));
+  }
+
   const mainWindow = createMainWindow();
-  // mainWindow.setEnabled(false)
-  // const welcomeWindow = createWelcomeWindow();
 
-  welcomeWindow.on('close', function() {
-    mainWindow.setEnabled(true)
-  })
+  if (userData.welcomeDisabled === false) {
+    mainWindow.setEnabled(false)
+    const welcomeWindow = createWelcomeWindow();
 
-  if (process.platform === 'win32') {
-    // On macOS disabling parent window also disables child windows
-    welcomeWindow.setParentWindow(mainWindow)
+    welcomeWindow.on('close', function() {
+      mainWindow.setEnabled(true)
+    })
+
+    if (process.platform === 'win32') {
+      // On macOS disabling parent window also disables child windows
+      welcomeWindow.setParentWindow(mainWindow)
+    }
   }
 
   app.on('activate', () => {
