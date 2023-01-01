@@ -9,7 +9,7 @@ module.exports = {
       name: '@electron-forge/maker-squirrel',
       config: {
         authors: 'Evelyn Jones',
-        description: 'A GUI for yt-dlp',
+        description: 'A Program for downloading YouTube videos',
         iconUrl: __dirname + '/assets/icons/icon',
         // setupIcon: __dirname + '/assets/icons/icon.ico',
       },
