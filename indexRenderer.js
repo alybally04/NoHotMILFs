@@ -6,10 +6,10 @@ let inputField;
 window.onload = function () {
     // TODO: Change this before building!
     // For when running in dev environment
-    pythonPath = ((process.platform === 'win32') ? 'venv\\Scripts\\python.exe' : 'venv/bin/python');
+    // pythonPath = ((process.platform === 'win32') ? 'venv\\Scripts\\python.exe' : 'venv/bin/python');
 
     // For when building distributable
-    // pythonPath = ((process.platform === 'win32') ?  process.resourcesPath + '\\venv\\Scripts\\python.exe' : process.resourcesPath + '/venv/bin/python')
+    pythonPath = ((process.platform === 'win32') ?  process.resourcesPath + '\\venv\\Scripts\\python.exe' : process.resourcesPath + '/venv/bin/python')
 
     lookupButton = document.querySelector('#search-button');
     inputField = document.querySelector('#input-field');
@@ -70,7 +70,11 @@ function lookupVideo() {
     args: ['lookup_video', url_input]
     };
 
-    let pyshell = PythonShell.run('core.py', options, function (err, results) {
+    // TODO: Change this before building!
+    // For running in dev enviroment:
+    // let pyshell = PythonShell.run('core.py', options, function (err, results) {
+    // For building:
+    let pyshell = PythonShell.run(((process.platform === 'win32') ? process.resourcesPath + '\\app\\core.py' : 'core.py'), options, function (err, results) {
         if (err) throw err;
     });
 

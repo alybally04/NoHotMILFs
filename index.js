@@ -1,6 +1,7 @@
 if (require('electron-squirrel-startup')) return;
 const { app, shell, BrowserWindow, ipcMain } = require('electron');
 const fs = require('fs')
+const commandLineArguments = process.argv;
 
 
 // this should be placed at top of main.js to handle setup events quickly
@@ -71,9 +72,21 @@ function handleSquirrelEvent() {
   }
 }
 
+if (commandLineArguments.includes('--squirrel-firstrun')) {
+  if (process.platform === 'win32') {
+    if (fs.existsSync(process.env.APPDATA + '\\NoHotMILFs')) {
+      fs.rmSync(process.env.APPDATA + '\\NoHotMILFs', {recursive: true, force: true});
+    }
+  } else {
+    if (fs.existsSync(process.env.HOME + '/Library/Preferences/NoHotMILFs')) {
+      fs.rmSync(process.env.HOME + '/Library/Preferences/NoHotMILFs', {recursive: true, force: true});
+    }
+  }
+}
+
 // TODO: remove old userData.json from appdatadir on install 
 // On MacOS process.env.APPDATA returns undefined, which is a falsy value (is equivalent to "false")
-const appDataDir = process.env.APPDATA ? process.env.APPDATA + '/NoHotMILFs/' : process.env.HOME + '/Library/Preferences/NoHotMILFs/'
+const appDataDir = process.env.APPDATA ? process.env.APPDATA + '\\NoHotMILFs\\' : process.env.HOME + '/Library/Preferences/NoHotMILFs/'
 if (fs.existsSync(appDataDir) === false) {
   fs.mkdirSync(appDataDir);
 }
