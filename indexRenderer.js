@@ -74,7 +74,11 @@ function lookupVideo() {
     // For running in dev enviroment:
     // let pyshell = PythonShell.run('core.py', options, function (err, results) {
     // For building:
-    let pyshell = PythonShell.run(((process.platform === 'win32') ? process.resourcesPath + '\\app\\core.py' : 'core.py'), options, function (err, results) {
+    // let pyshell = PythonShell.run(((process.platform === 'win32') ? process.resourcesPath + '\\app\\core.py' : 'core.py'), options, function (err, results) {
+    //     if (err) throw err;
+    // });
+    let pyshell = PythonShell.run(__dirname + '/core.py', options, function (err, results) {
+    // let pyshell = PythonShell.run('core.py', options, function (err, results) {
         if (err) throw err;
     });
 
@@ -258,8 +262,8 @@ function downloadVideo(url, title, formatId, fileType, fileSize) {
     args: ['download_video', url, title, formatId, fileType]
     };
 
-    // let pyshell = PythonShell.run(__dirname + '/core.py', options, function (err, results) {
-    let pyshell = PythonShell.run('core.py', options, function (err, results) {
+    let pyshell = PythonShell.run(__dirname + '/core.py', options, function (err, results) {
+    // let pyshell = PythonShell.run('core.py', options, function (err, results) {
         if (err) throw err;
     });
 
