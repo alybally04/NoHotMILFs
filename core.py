@@ -85,7 +85,7 @@ def lookup_video():
             raw_info = ydl.extract_info(url_input, download=False)
 
         video_info = {
-            # Keys in camelCase for use in JavaScriptu
+            # Keys in camelCase for use in JavaScript
             'title': raw_info['title'],
             'channel': raw_info['uploader'],
             'duration': time_readable(raw_info['duration']),

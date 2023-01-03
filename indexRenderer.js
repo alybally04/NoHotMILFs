@@ -1,9 +1,40 @@
+const { exec } = require("child_process");
 let lookupButton;
 let inputField;
+let OSAssetsDirPath;
+let ffmpegPath;
+let downloadsPath;
 
 window.onload = function () {
     lookupButton = document.querySelector('#search-button');
     inputField = document.querySelector('#input-field');
+
+    // TODO: change before building!
+    // For when building
+    /*
+    if (process.platform === 'win32') {
+        OSAssetsDirPath = process.resourcesPath + '\\assets\\Win';
+        ffmpegPath = process.resourcesPath + '\\assets\\Win\\ffmpeg\\bin';
+        downloadsPath = '%USERPROFILE%\\Downloads';
+    } else {
+        OSAssetsDirPath = process.resourcesPath + 'assets\\Mac';
+        ffmpegPath = process.resourcesPath + 'assets/Mac/ffmpeg';
+        downloadsPath = '~/Downloads/';
+    }
+    */
+
+    // For when running in dev environment
+    // /*
+    if (process.platform === 'win32') {
+        OSAssetsDirPath = 'assets\\Win';
+        ffmpegPath = 'assets/ffmpeg/ffmpegWin/bin';
+        downloadsPath = '%USERPROFILE%\\Downloads';
+    } else {
+        OSAssetsDirPath = 'assets/Mac';
+        ffmpegPath = 'assets/Mac/ffmpeg';
+        downloadsPath = '~/Downloads/';
+    }
+    // */
 
     document.querySelector('#url-input').addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
@@ -20,7 +51,6 @@ function disableInputs (bool) {
     inputField.disabled = bool;
 }
 
-// TODO: Remove use of python in getting video formats and downloading videos
 function lookupVideo () {
     disableInputs(true);
 
@@ -46,42 +76,12 @@ function lookupVideo () {
     loadingIcon.className = 'loading-icon';
     main.appendChild(loadingIcon);
 
-
     // Getting the user input
     const url_input = document.querySelector('#input-field').value
+    const ytdlpArgs = '--quiet --no-playlist --no-cache-dir --skip-download --dump-json'
 
-
-}
-
-/*
-function lookupVideo() {
-    let options = {
-    mode: 'text',
-    pythonPath: pythonPath,
-    // Get print results in real-time
-    pythonOptions: ['-u'],
-    // Path to directory of script
-    scriptPath: '',
-    args: ['lookup_video', url_input]
-    };
-
-    // TODO: Change this before building!
-    // For running in dev enviroment:
-    // let pyshell = PythonShell.run('core.py', options, function (err, results) {
-    // For building:
-    // let pyshell = PythonShell.run(((process.platform === 'win32') ? process.resourcesPath + '\\app\\core.py' : 'core.py'), options, function (err, results) {
-    //     if (err) throw err;
-    // });
-    let pyshell = PythonShell.run(__dirname + '/core.py', options, function (err, results) {
-    // let pyshell = PythonShell.run('core.py', options, function (err, results) {
-        if (err) throw err;
-    });
-
-    // Receives output from python script via print statements
-    pyshell.on('message', function (message) {
-        const parsedMessage = JSON.parse(message);
-
-        if (parsedMessage.hasOwnProperty('error')) {
+    exec(`cd ${OSAssetsDirPath} && ./yt-dlp ${ytdlpArgs} "${url_input}"`, (err, stdout, stderr) => {
+        if (err || stderr) {
             // Generating video information section
             const videoTitle = document.createElement('h3');
             videoTitle.appendChild(document.createTextNode('An error has occurred!'));
@@ -104,26 +104,28 @@ function lookupVideo() {
             main.appendChild(videoInfoSection);
 
         } else {
-            const videoInfo = parsedMessage.videoInfo;
-            const formats = parsedMessage.formats;
+            // TODO: write time readable and date readable functions
+            // Parsing video data json returned from yt-dlp
+            const infoJson = JSON.parse(stdout)
 
             // Generating video information section
             const videoTitle = document.createElement('h3');
             let titleText;
 
-            if (videoInfo.title.length > 85) {
-                titleText = videoInfo.title.substring(0, 80) + '...'
+            if (infoJson['title'].length > 85) {
+                titleText = infoJson['title'].substring(0, 80) + '...';
             } else {
-                titleText = videoInfo.title
+                titleText = infoJson['title'];
             }
 
             videoTitle.appendChild(document.createTextNode(titleText));
 
             const infoText = document.createElement('p')
-            infoText.innerHTML = `Length: ${videoInfo.duration}<br>Channel: ${videoInfo.channel}<br>Uploaded on: ${videoInfo.uploadDate}`;
+            // time_readable(infoJson['duration']) date_readable(infoJson['upload_date']) infoJson['webpage_url']
+            infoText.innerHTML = `Length: ${infoJson['duration']}<br>Channel: ${infoJson['uploader']}<br>Uploaded on: ${infoJson['upload_date']}`;
 
             const videoThumbnail = document.createElement('img');
-            videoThumbnail.src = videoInfo.thumbnail;
+            videoThumbnail.src = infoJson['thumbnail'];
             videoThumbnail.alt = "Youtube video thumbnail"
 
             const infoDiv = document.createElement('div')
@@ -160,36 +162,55 @@ function lookupVideo() {
             tableHead.appendChild(row)
 
             // Generating tableBody
-            for (let count = 0; count < formats.length; count++) {
-                const row = document.createElement('tr');
+            let audioFileSize = 0;
+            for (let count = 0; count < infoJson['formats'].length; count++) {
+                const currentFormat = infoJson['formats'][count];
 
-                for (let i = 0; i < 4; i++) {
-                    const cell = document.createElement('td');
-                    let cellData;
+                // mhtml files are useless
+                if (currentFormat['ext'] !== 'mhtml') {
+                    const row = document.createElement('tr');
+                    const fileTypeCell = document.createElement('td');
+                    fileTypeCell.textContent = currentFormat['ext'];
+                    const fileQualityCell = document.createElement('td');
+                    const fileSizeCell = document.createElement('td');
+                    const downloadButtonCell = document.createElement('td');
 
-                    if (i === 0) {
-                        cellData = document.createTextNode(formats[count].fileType);
+                    // Checks for any digit between 0 and 9 in a string (Audio files do not include any in format note)
+                    if (/[0-9]/.test(currentFormat['format_note'])) {
+                        fileQualityCell.textContent = currentFormat['format_note'];
 
-                    } else if (i === 1) {
-                        cellData = document.createTextNode(formats[count].quality);
-
-                    } else if (i === 2) {
-                        cellData = document.createTextNode(formats[count].fileSize);
+                        if ('filesize' in currentFormat && typeof currentFormat['filesize'] === 'number') {
+                            fileSizeCell.textContent = currentFormat['filesize'] + audioFileSize;
+                        } else {
+                            fileSizeCell.textContent = 'UNAVAILABLE';
+                        }
 
                     } else {
-                        cellData = document.createElement('input');
-                        cellData.type = 'button';
-                        cellData.value = 'Download';
-                        // noinspection JSValidateTypes,JSVoidFunctionReturnValueUsed
-                        // cellData.onclick = downloadVideo(url_input, videoInfo.title, formats[count].formatID, formats[count].fileType);
-                        cellData.onclick = () => {downloadVideo(url_input, videoInfo.title, formats[count].formatID, formats[count].fileType, formats[count].fileSize)};
+                        fileQualityCell.textContent = 'Audio only - ' + currentFormat['format_note'];
+                        audioFileSize = currentFormat['filesize']
+
+                        if ('filesize' in currentFormat && typeof currentFormat['filesize'] === 'number') {
+                            fileSizeCell.textContent = currentFormat['filesize'];
+                        } else {
+                            fileSizeCell.textContent = 'UNAVAILABLE';
+                        }
                     }
 
-                    cell.appendChild(cellData);
-                    row.appendChild(cell);
+                    const downloadButton = document.createElement('input');
+                    downloadButton.type = 'button';
+                    downloadButton.value = 'Download';
+                    // downloadButton.onclick = () => {downloadVideo(url_input, videoInfo.title, formats[count].formatID, formats[count].fileType, formats[count].fileSize)};
+                    downloadButtonCell.appendChild(downloadButton);
+
+                    // Adding row of info and download button to table of formats
+                    row.appendChild(fileTypeCell);
+                    row.appendChild(fileQualityCell);
+                    row.appendChild(fileSizeCell);
+                    row.appendChild(downloadButtonCell);
+                    tableBody.appendChild(row);
                 }
-                tableBody.appendChild(row);
             }
+
             table.appendChild(tableHead);
             table.appendChild(tableBody);
             formatsTableSection.appendChild(table);
@@ -198,21 +219,15 @@ function lookupVideo() {
             main.appendChild(videoInfoSection);
             main.appendChild(formatsTableSection);
         }
-    });
 
-    // end the input stream and allow the process to exit
-    pyshell.end(function (err, code, signal) {
-        if (err) throw err;
-        console.log('The exit code was: ' + code);
-        console.log('The exit signal was: ' + signal);
-        console.log('finished');
-
-        // Removing loading icon once loading is finished
+        // Removing loading icon and re-enabling inputs once exec that gets video info is finished
         loadingIcon.remove();
         disableInputs(false);
-    });
+    })
 }
 
+// TODO: move downloading of video from python script to renderer process
+/*
 function downloadVideo(url, title, formatId, fileType, fileSize) {
     disableInputs(true);
 
