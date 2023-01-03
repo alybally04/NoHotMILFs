@@ -2,6 +2,7 @@ const { exec } = require("child_process");
 let lookupButton;
 let inputField;
 let OSAssetsDirPath;
+let ytdlpBinaryName;
 let ffmpegPath;
 let downloadsPath;
 
@@ -14,10 +15,12 @@ window.onload = function () {
     /*
     if (process.platform === 'win32') {
         OSAssetsDirPath = process.resourcesPath + '\\assets\\Win';
+        ytdlpBinaryName = 'yt-dlp.exe';
         ffmpegPath = process.resourcesPath + '\\assets\\Win\\ffmpeg\\bin';
         downloadsPath = '%USERPROFILE%\\Downloads';
     } else {
         OSAssetsDirPath = process.resourcesPath + 'assets\\Mac';
+        ytdlpBinaryName = './yt-dlp';
         ffmpegPath = process.resourcesPath + 'assets/Mac/ffmpeg';
         downloadsPath = '~/Downloads/';
     }
@@ -27,10 +30,12 @@ window.onload = function () {
     // /*
     if (process.platform === 'win32') {
         OSAssetsDirPath = 'assets\\Win';
+        ytdlpBinaryName = 'yt-dlp.exe';
         ffmpegPath = 'assets/ffmpeg/ffmpegWin/bin';
         downloadsPath = '%USERPROFILE%\\Downloads';
     } else {
         OSAssetsDirPath = 'assets/Mac';
+        ytdlpBinaryName = './yt-dlp';
         ffmpegPath = 'assets/Mac/ffmpeg';
         downloadsPath = '~/Downloads/';
     }
@@ -49,6 +54,59 @@ window.onload = function () {
 function disableInputs (bool) {
     lookupButton.disabled = bool;
     inputField.disabled = bool;
+}
+
+function filesizeReadable (numberOfBytes) {
+    let units;
+
+    if (numberOfBytes < 1024) { // bytes
+        units = 'Bytes';
+    } else if (numberOfBytes < 1048576) { // kilobytes
+        numberOfBytes /= 1024;
+        units = 'KB';
+    } else if (numberOfBytes < 1073741824) { // megabytes
+        numberOfBytes /= 1048576;
+        units = 'MB';
+    } else { // gigabytes
+        numberOfBytes /= 1073741824;
+        units = 'GB';
+    }
+
+    // Format and return the output (Multiply by 10 and divide by 10 to keep 1 decimal place)
+    return `${Math.round(numberOfBytes * 10) / 10} ${units}`;
+}
+
+function timeReadable (num) {
+    let minutes = Math.floor(num / 60);
+    let seconds = num % 60;
+
+    if (minutes < 60) {
+        if (seconds < 10) {
+            return `${minutes}:0${seconds}`;
+        } else {
+            return `${minutes}:${seconds}`;
+        }
+
+    } else {
+        let stringToReturn = '';
+        // Adding number of hours
+        stringToReturn += Math.floor(minutes / 60);
+
+        minutes %= 60
+        if (minutes < 10) {
+            stringToReturn += `:0${minutes}`;
+        } else {
+            stringToReturn += `:${minutes}`;
+        }
+
+        if (seconds < 10) {
+            stringToReturn += `:0${seconds}`;
+        } else {
+            stringToReturn += `:${seconds}`;
+        }
+
+        return stringToReturn;
+    }
 }
 
 function lookupVideo () {
@@ -80,14 +138,14 @@ function lookupVideo () {
     const url_input = document.querySelector('#input-field').value
     const ytdlpArgs = '--quiet --no-playlist --no-cache-dir --skip-download --dump-json'
 
-    exec(`cd ${OSAssetsDirPath} && ./yt-dlp ${ytdlpArgs} "${url_input}"`, (err, stdout, stderr) => {
+    exec(`cd ${OSAssetsDirPath} && ${ytdlpBinaryName} ${ytdlpArgs} "${url_input}"`, (err, stdout, stderr) => {
         if (err || stderr) {
             // Generating video information section
             const videoTitle = document.createElement('h3');
-            videoTitle.appendChild(document.createTextNode('An error has occurred!'));
+            videoTitle.innerText = 'An error has occurred!';
 
             const infoText = document.createElement('p')
-            infoText.innerHTML = 'Please ensure the URL was entered correctly and try again';
+            infoText.innerText = 'Please ensure the URL was entered correctly and try again';
 
             const videoThumbnail = document.createElement('img');
             videoThumbnail.src = '../assets/images/imageUnavailable.png';
@@ -104,25 +162,23 @@ function lookupVideo () {
             main.appendChild(videoInfoSection);
 
         } else {
-            // TODO: write time readable and date readable functions
             // Parsing video data json returned from yt-dlp
             const infoJson = JSON.parse(stdout)
 
             // Generating video information section
-            const videoTitle = document.createElement('h3');
             let titleText;
-
             if (infoJson['title'].length > 85) {
                 titleText = infoJson['title'].substring(0, 80) + '...';
             } else {
                 titleText = infoJson['title'];
             }
 
-            videoTitle.appendChild(document.createTextNode(titleText));
+            const videoTitle = document.createElement('h3');
+            videoTitle.innerText = titleText;
 
             const infoText = document.createElement('p')
             // time_readable(infoJson['duration']) date_readable(infoJson['upload_date']) infoJson['webpage_url']
-            infoText.innerHTML = `Length: ${infoJson['duration']}<br>Channel: ${infoJson['uploader']}<br>Uploaded on: ${infoJson['upload_date']}`;
+            infoText.innerHTML = `Length: ${timeReadable(infoJson['duration'])}<br>Channel: ${infoJson['uploader']}<br>Uploaded on: ${infoJson['upload_date']}`;
 
             const videoThumbnail = document.createElement('img');
             videoThumbnail.src = infoJson['thumbnail'];
@@ -144,15 +200,15 @@ function lookupVideo () {
             const row = document.createElement('tr');
 
             const cell1 = document.createElement('th');
-            cell1.appendChild(document.createTextNode('Format'));
+            cell1.innerText = 'Format';
             row.appendChild(cell1);
 
             const cell2 = document.createElement('th');
-            cell2.appendChild(document.createTextNode('Quality'));
+            cell2.innerText = 'Quality';
             row.appendChild(cell2);
 
             const cell3 = document.createElement('th');
-            cell3.appendChild(document.createTextNode('Size'));
+            cell3.innerText = 'Size';
             row.appendChild(cell3);
 
             // No text as button column
@@ -180,7 +236,8 @@ function lookupVideo () {
                         fileQualityCell.textContent = currentFormat['format_note'];
 
                         if ('filesize' in currentFormat && typeof currentFormat['filesize'] === 'number') {
-                            fileSizeCell.textContent = currentFormat['filesize'] + audioFileSize;
+                            // Combine video filesize with largest audio filesize, as video and best audio are combined
+                            fileSizeCell.textContent = filesizeReadable(currentFormat['filesize'] + audioFileSize);
                         } else {
                             fileSizeCell.textContent = 'UNAVAILABLE';
                         }
@@ -190,7 +247,7 @@ function lookupVideo () {
                         audioFileSize = currentFormat['filesize']
 
                         if ('filesize' in currentFormat && typeof currentFormat['filesize'] === 'number') {
-                            fileSizeCell.textContent = currentFormat['filesize'];
+                            fileSizeCell.textContent = filesizeReadable(currentFormat['filesize']);
                         } else {
                             fileSizeCell.textContent = 'UNAVAILABLE';
                         }
