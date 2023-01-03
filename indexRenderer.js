@@ -1,16 +1,7 @@
-const {PythonShell} = require('python-shell')
-let pythonPath;
-
 let lookupButton;
 let inputField;
+
 window.onload = function () {
-    // TODO: Change this before building!
-    // For when running in dev environment
-    // pythonPath = ((process.platform === 'win32') ? 'venv\\Scripts\\python.exe' : 'venv/bin/python');
-
-    // For when building distributable
-    pythonPath = ((process.platform === 'win32') ?  process.resourcesPath + '\\venv\\Scripts\\python.exe' : process.resourcesPath + '/venv/bin/python')
-
     lookupButton = document.querySelector('#search-button');
     inputField = document.querySelector('#input-field');
 
@@ -22,7 +13,6 @@ window.onload = function () {
     });
 }
 
-
 // Disable or enable all inputs on UI
 // Provide true or false as args
 function disableInputs (bool) {
@@ -30,8 +20,8 @@ function disableInputs (bool) {
     inputField.disabled = bool;
 }
 
-
-function lookupVideo() {
+// TODO: Remove use of python in getting video formats and downloading videos
+function lookupVideo () {
     disableInputs(true);
 
     // Removing previous video info and formats table sections and creating new ones
@@ -60,6 +50,11 @@ function lookupVideo() {
     // Getting the user input
     const url_input = document.querySelector('#input-field').value
 
+
+}
+
+/*
+function lookupVideo() {
     let options = {
     mode: 'text',
     pythonPath: pythonPath,
@@ -218,7 +213,6 @@ function lookupVideo() {
     });
 }
 
-
 function downloadVideo(url, title, formatId, fileType, fileSize) {
     disableInputs(true);
 
@@ -316,3 +310,4 @@ function downloadVideo(url, title, formatId, fileType, fileSize) {
         disableInputs(false);
     });
 }
+*/
