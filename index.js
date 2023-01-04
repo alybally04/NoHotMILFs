@@ -104,7 +104,6 @@ ipcMain.on ("disableWelcome", (event) => {
   });
 });
 
-
 let mainWindow;
 const createMainWindow = () => {
   mainWindow = new BrowserWindow({
@@ -121,6 +120,12 @@ const createMainWindow = () => {
 
   mainWindow.removeMenu();
   mainWindow.loadFile('pages/index.html')
+
+  // Sending app's main directory to main page renderer once the main page has loaded
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('appDir', app.getAppPath());
+  })
+
   mainWindow.webContents.openDevTools();
 
   return mainWindow

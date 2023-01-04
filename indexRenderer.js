@@ -1,6 +1,9 @@
+const { ipcRenderer } = require('electron');
 const { exec } = require("child_process");
+
 let lookupButton;
 let inputField;
+let appDir;
 let OSAssetsDirPath;
 let ytdlpBinaryName;
 let ffmpegPath;
@@ -10,37 +13,6 @@ window.onload = function () {
     lookupButton = document.querySelector('#search-button');
     inputField = document.querySelector('#input-field');
 
-    // TODO: change before building!
-    // For when building
-    /*
-    if (process.platform === 'win32') {
-        OSAssetsDirPath = process.resourcesPath + '\\assets\\Win';
-        ytdlpBinaryName = 'yt-dlp.exe';
-        ffmpegPath = process.resourcesPath + '\\assets\\Win\\ffmpeg\\bin';
-        downloadsPath = '%USERPROFILE%\\Downloads';
-    } else {
-        OSAssetsDirPath = process.resourcesPath + 'assets\\Mac';
-        ytdlpBinaryName = './yt-dlp';
-        ffmpegPath = process.resourcesPath + 'assets/Mac/ffmpeg';
-        downloadsPath = '~/Downloads/';
-    }
-    */
-
-    // For when running in dev environment
-    // /*
-    if (process.platform === 'win32') {
-        OSAssetsDirPath = 'assets\\Win';
-        ytdlpBinaryName = 'yt-dlp.exe';
-        ffmpegPath = 'assets/ffmpeg/ffmpegWin/bin';
-        downloadsPath = '%USERPROFILE%\\Downloads';
-    } else {
-        OSAssetsDirPath = 'assets/Mac';
-        ytdlpBinaryName = './yt-dlp';
-        ffmpegPath = 'assets/Mac/ffmpeg';
-        downloadsPath = '~/Downloads/';
-    }
-    // */
-
     document.querySelector('#url-input').addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
             event.preventDefault();
@@ -48,6 +20,22 @@ window.onload = function () {
         }
     });
 }
+
+ipcRenderer.on('appDir', function (evt, message) {
+    appDir = message;
+
+    if (process.platform === 'win32') {
+        OSAssetsDirPath = appDir + '\\assets\\Win';
+        ytdlpBinaryName = 'yt-dlp.exe';
+        ffmpegPath = appDir + '\\assets\\ffmpeg\\ffmpegWin\\bin';
+        downloadsPath = '%USERPROFILE%\\Downloads';
+    } else {
+        OSAssetsDirPath = appDir + '/assets/Mac';
+        ytdlpBinaryName = './yt-dlp';
+        ffmpegPath = appDir + '/assets/Mac/ffmpeg';
+        downloadsPath = '~/Downloads/';
+    }
+});
 
 // Disable or enable all inputs on UI
 // Provide true or false as args
@@ -138,8 +126,12 @@ function lookupVideo () {
     const url_input = document.querySelector('#input-field').value
     const ytdlpArgs = '--quiet --no-playlist --no-cache-dir --skip-download --dump-json'
 
+    // exec(`cd ${__dirname} && cd .. && cd ${OSAssetsDirPath} && ${ytdlpBinaryName} ${ytdlpArgs} "${url_input}"`, (err, stdout, stderr) => {
     exec(`cd ${OSAssetsDirPath} && ${ytdlpBinaryName} ${ytdlpArgs} "${url_input}"`, (err, stdout, stderr) => {
         if (err || stderr) {
+            console.log(err);
+            console.log(stderr);
+
             // Generating video information section
             const videoTitle = document.createElement('h3');
             videoTitle.innerText = 'An error has occurred!';
