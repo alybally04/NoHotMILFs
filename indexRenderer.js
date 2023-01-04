@@ -1,16 +1,16 @@
-const {PythonShell} = require('python-shell')
-let pythonPath;
+const { ipcRenderer } = require('electron');
+const { exec, spawn } = require("child_process");
 
 let lookupButton;
 let inputField;
+let appDir;
+let OSAssetsDirPath;
+let ytdlpBinaryName;
+let ffmpegPath;
+let downloadsPath;
+let postprocessorArgs;
+
 window.onload = function () {
-    // TODO: Change this before building!
-    // For when running in dev environment
-    // pythonPath = ((process.platform === 'win32') ? 'venv\\Scripts\\python.exe' : 'venv/bin/python');
-
-    // For when building distributable
-    pythonPath = ((process.platform === 'win32') ?  process.resourcesPath + '\\venv\\Scripts\\python.exe' : process.resourcesPath + '/venv/bin/python')
-
     lookupButton = document.querySelector('#search-button');
     inputField = document.querySelector('#input-field');
 
@@ -22,6 +22,24 @@ window.onload = function () {
     });
 }
 
+ipcRenderer.on('appDir', function (evt, message) {
+    appDir = message;
+
+    if (process.platform === 'win32') {
+        OSAssetsDirPath = appDir + '\\assets\\Win';
+        ytdlpBinaryName = 'yt-dlp.exe';
+        ffmpegPath = appDir + '\\assets\\Win\\ffmpeg\\bin';
+        downloadsPath = '%USERPROFILE%\\Downloads\\';
+        postprocessorArgs = '';
+    } else {
+        OSAssetsDirPath = appDir + '/assets/Mac';
+        ytdlpBinaryName = './yt-dlp';
+        ffmpegPath = appDir + '/assets/Mac/ffmpeg';
+        downloadsPath = '~/Downloads/';
+        // MacOS get pissy about codec and pixel format
+        postprocessorArgs = '-vcodec libx264 -pix_fmt yuv420p';
+    }
+});
 
 // Disable or enable all inputs on UI
 // Provide true or false as args
@@ -30,8 +48,64 @@ function disableInputs (bool) {
     inputField.disabled = bool;
 }
 
+function filesizeReadable (numberOfBytes) {
+    let units;
 
-function lookupVideo() {
+    if (numberOfBytes < 1024) { // bytes
+        units = 'Bytes';
+    } else if (numberOfBytes < 1048576) { // kilobytes
+        numberOfBytes /= 1024;
+        units = 'KB';
+    } else if (numberOfBytes < 1073741824) { // megabytes
+        numberOfBytes /= 1048576;
+        units = 'MB';
+    } else { // gigabytes
+        numberOfBytes /= 1073741824;
+        units = 'GB';
+    }
+
+    // Format and return the output (Multiply by 10 and divide by 10 to keep 1 decimal place)
+    return `${Math.round(numberOfBytes * 10) / 10} ${units}`;
+}
+
+function timeReadable (num) {
+    let minutes = Math.floor(num / 60);
+    let seconds = num % 60;
+
+    if (minutes < 60) {
+        if (seconds < 10) {
+            return `${minutes}:0${seconds}`;
+        } else {
+            return `${minutes}:${seconds}`;
+        }
+
+    } else {
+        let stringToReturn = '';
+        // Adding number of hours
+        stringToReturn += Math.floor(minutes / 60);
+
+        minutes %= 60
+        if (minutes < 10) {
+            stringToReturn += `:0${minutes}`;
+        } else {
+            stringToReturn += `:${minutes}`;
+        }
+
+        if (seconds < 10) {
+            stringToReturn += `:0${seconds}`;
+        } else {
+            stringToReturn += `:${seconds}`;
+        }
+
+        return stringToReturn;
+    }
+}
+
+function dateReadable (date) {
+    return `${date.substring(6)}/${date.substring(4, 6)}/${date.substring(0, 4)}`
+}
+
+function lookupVideo () {
     disableInputs(true);
 
     // Removing previous video info and formats table sections and creating new ones
@@ -56,43 +130,20 @@ function lookupVideo() {
     loadingIcon.className = 'loading-icon';
     main.appendChild(loadingIcon);
 
-
     // Getting the user input
-    const url_input = document.querySelector('#input-field').value
+    const urlInput = document.querySelector('#input-field').value
+    const ytdlpArgs = '--quiet --no-playlist --no-cache-dir --skip-download --dump-json'
 
-    let options = {
-    mode: 'text',
-    pythonPath: pythonPath,
-    // Get print results in real-time
-    pythonOptions: ['-u'],
-    // Path to directory of script
-    scriptPath: '',
-    args: ['lookup_video', url_input]
-    };
+    exec(`cd ${OSAssetsDirPath} && ${ytdlpBinaryName} ${ytdlpArgs} "${urlInput}"`, (err, stdout, stderr) => {
+        if (err || stderr) {
+            console.warn(stderr);
 
-    // TODO: Change this before building!
-    // For running in dev enviroment:
-    // let pyshell = PythonShell.run('core.py', options, function (err, results) {
-    // For building:
-    // let pyshell = PythonShell.run(((process.platform === 'win32') ? process.resourcesPath + '\\app\\core.py' : 'core.py'), options, function (err, results) {
-    //     if (err) throw err;
-    // });
-    let pyshell = PythonShell.run(__dirname + '/core.py', options, function (err, results) {
-    // let pyshell = PythonShell.run('core.py', options, function (err, results) {
-        if (err) throw err;
-    });
-
-    // Receives output from python script via print statements
-    pyshell.on('message', function (message) {
-        const parsedMessage = JSON.parse(message);
-
-        if (parsedMessage.hasOwnProperty('error')) {
             // Generating video information section
             const videoTitle = document.createElement('h3');
-            videoTitle.appendChild(document.createTextNode('An error has occurred!'));
+            videoTitle.innerText = 'An error has occurred!';
 
             const infoText = document.createElement('p')
-            infoText.innerHTML = 'Please ensure the URL was entered correctly and try again';
+            infoText.innerText = 'Please ensure the URL was entered correctly and try again';
 
             const videoThumbnail = document.createElement('img');
             videoThumbnail.src = '../assets/images/imageUnavailable.png';
@@ -109,26 +160,26 @@ function lookupVideo() {
             main.appendChild(videoInfoSection);
 
         } else {
-            const videoInfo = parsedMessage.videoInfo;
-            const formats = parsedMessage.formats;
+            // Parsing video data json returned from yt-dlp
+            const infoJson = JSON.parse(stdout)
 
             // Generating video information section
-            const videoTitle = document.createElement('h3');
             let titleText;
-
-            if (videoInfo.title.length > 85) {
-                titleText = videoInfo.title.substring(0, 80) + '...'
+            if (infoJson['title'].length > 85) {
+                titleText = infoJson['title'].substring(0, 80) + '...';
             } else {
-                titleText = videoInfo.title
+                titleText = infoJson['title'];
             }
 
-            videoTitle.appendChild(document.createTextNode(titleText));
+            const videoTitle = document.createElement('h3');
+            videoTitle.innerText = titleText;
 
             const infoText = document.createElement('p')
-            infoText.innerHTML = `Length: ${videoInfo.duration}<br>Channel: ${videoInfo.channel}<br>Uploaded on: ${videoInfo.uploadDate}`;
+            // time_readable(infoJson['duration']) date_readable(infoJson['upload_date']) infoJson['webpage_url']
+            infoText.innerHTML = `Length: ${timeReadable(infoJson['duration'])}<br>Channel: ${infoJson['uploader']}<br>Uploaded on: ${dateReadable(infoJson['upload_date'])}`;
 
             const videoThumbnail = document.createElement('img');
-            videoThumbnail.src = videoInfo.thumbnail;
+            videoThumbnail.src = infoJson['thumbnail'];
             videoThumbnail.alt = "Youtube video thumbnail"
 
             const infoDiv = document.createElement('div')
@@ -147,15 +198,15 @@ function lookupVideo() {
             const row = document.createElement('tr');
 
             const cell1 = document.createElement('th');
-            cell1.appendChild(document.createTextNode('Format'));
+            cell1.innerText = 'Format';
             row.appendChild(cell1);
 
             const cell2 = document.createElement('th');
-            cell2.appendChild(document.createTextNode('Quality'));
+            cell2.innerText = 'Quality';
             row.appendChild(cell2);
 
             const cell3 = document.createElement('th');
-            cell3.appendChild(document.createTextNode('Size'));
+            cell3.innerText = 'Size';
             row.appendChild(cell3);
 
             // No text as button column
@@ -165,36 +216,59 @@ function lookupVideo() {
             tableHead.appendChild(row)
 
             // Generating tableBody
-            for (let count = 0; count < formats.length; count++) {
-                const row = document.createElement('tr');
+            let audioFileSize = 0;
+            for (let count = 0; count < infoJson['formats'].length; count++) {
+                const currentFormat = infoJson['formats'][count];
 
-                for (let i = 0; i < 4; i++) {
-                    const cell = document.createElement('td');
-                    let cellData;
+                // mhtml and weba files are useless
+                if (currentFormat['ext'] !== 'mhtml' && currentFormat['ext'] !== 'weba') {
+                    const row = document.createElement('tr');
+                    const fileTypeCell = document.createElement('td');
+                    fileTypeCell.textContent = currentFormat['ext'];
+                    let fileExt;
+                    const fileQualityCell = document.createElement('td');
+                    const fileSizeCell = document.createElement('td');
+                    const downloadButtonCell = document.createElement('td');
 
-                    if (i === 0) {
-                        cellData = document.createTextNode(formats[count].fileType);
+                    // Checks for any digit between 0 and 9 in a string (Audio files do not include any in format note)
+                    if (/[0-9]/.test(currentFormat['format_note'])) { // If video
+                        fileExt = 'mp4';
+                        fileQualityCell.textContent = currentFormat['format_note'];
 
-                    } else if (i === 1) {
-                        cellData = document.createTextNode(formats[count].quality);
+                        if ('filesize' in currentFormat && typeof currentFormat['filesize'] === 'number') {
+                            // Combine video filesize with the largest audio filesize, as video and best audio are combined
+                            fileSizeCell.textContent = filesizeReadable(currentFormat['filesize'] + audioFileSize);
+                        } else {
+                            fileSizeCell.textContent = 'UNAVAILABLE';
+                        }
 
-                    } else if (i === 2) {
-                        cellData = document.createTextNode(formats[count].fileSize);
+                    } else { // If audio only
+                        fileExt = currentFormat['ext'];
+                        fileQualityCell.textContent = 'Audio only - ' + currentFormat['format_note'];
+                        audioFileSize = currentFormat['filesize']
 
-                    } else {
-                        cellData = document.createElement('input');
-                        cellData.type = 'button';
-                        cellData.value = 'Download';
-                        // noinspection JSValidateTypes,JSVoidFunctionReturnValueUsed
-                        // cellData.onclick = downloadVideo(url_input, videoInfo.title, formats[count].formatID, formats[count].fileType);
-                        cellData.onclick = () => {downloadVideo(url_input, videoInfo.title, formats[count].formatID, formats[count].fileType, formats[count].fileSize)};
+                        if ('filesize' in currentFormat && typeof currentFormat['filesize'] === 'number') {
+                            fileSizeCell.textContent = filesizeReadable(currentFormat['filesize']);
+                        } else {
+                            fileSizeCell.textContent = 'UNAVAILABLE';
+                        }
                     }
 
-                    cell.appendChild(cellData);
-                    row.appendChild(cell);
+                    const downloadButton = document.createElement('input');
+                    downloadButton.type = 'button';
+                    downloadButton.value = 'Download';
+                    downloadButton.onclick = () => {downloadVideo(urlInput, titleText, currentFormat['format_id'], fileExt)};
+                    downloadButtonCell.appendChild(downloadButton);
+
+                    // Adding row of info and download button to table of formats
+                    row.appendChild(fileTypeCell);
+                    row.appendChild(fileQualityCell);
+                    row.appendChild(fileSizeCell);
+                    row.appendChild(downloadButtonCell);
+                    tableBody.appendChild(row);
                 }
-                tableBody.appendChild(row);
             }
+
             table.appendChild(tableHead);
             table.appendChild(tableBody);
             formatsTableSection.appendChild(table);
@@ -203,29 +277,21 @@ function lookupVideo() {
             main.appendChild(videoInfoSection);
             main.appendChild(formatsTableSection);
         }
-    });
 
-    // end the input stream and allow the process to exit
-    pyshell.end(function (err, code, signal) {
-        if (err) throw err;
-        console.log('The exit code was: ' + code);
-        console.log('The exit signal was: ' + signal);
-        console.log('finished');
-
-        // Removing loading icon once loading is finished
+        // Removing loading icon and re-enabling inputs once exec that gets video info is finished
         loadingIcon.remove();
         disableInputs(false);
-    });
+    })
 }
 
-
-function downloadVideo(url, title, formatId, fileType, fileSize) {
+function downloadVideo(url, title, formatId, fileType) {
     disableInputs(true);
 
     if (document.querySelector('#success-message') !== null) {
         document.querySelector('#success-message').remove();
     }
 
+    // Creating download progress info section
     const formatsTableSection = document.querySelector('#formats-table');
     formatsTableSection.style.display = 'none';
 
@@ -237,7 +303,6 @@ function downloadVideo(url, title, formatId, fileType, fileSize) {
     currentDownloadSection.appendChild(currentDownloadTitle);
 
     let downloadProgressInfo = document.createElement('p');
-    // downloadProgressInfo.innerText = `Downloaded 0 ${fileSize.substring(fileSize.length - 2)} of ${fileSize}&nbsp;&nbsp;—&nbsp;&nbsp;ETA: Calculating...`;
     downloadProgressInfo.innerText = 'Beginning download...';
     currentDownloadSection.appendChild(downloadProgressInfo);
 
@@ -252,40 +317,52 @@ function downloadVideo(url, title, formatId, fileType, fileSize) {
     const main = document.querySelector('main');
     main.appendChild(currentDownloadSection);
 
-    let options = {
-    mode: 'text',
-    pythonPath: pythonPath,
-    // Get print results in real-time
-    pythonOptions: ['-u'],
-    // Path to directory of script
-    scriptPath: '',
-    args: ['download_video', url, title, formatId, fileType]
-    };
-
-    let pyshell = PythonShell.run(__dirname + '/core.py', options, function (err, results) {
-    // let pyshell = PythonShell.run('core.py', options, function (err, results) {
-        if (err) throw err;
+    // Downloading Video
+    // Format selection ignores "+bestaudio" if format id is for audio file
+    const ytdlpArgs = `--progress-template "download-title:%(info.id)s-%(progress.eta)s" --no-playlist --no-cache-dir --no-mtime --format "${formatId}+bestaudio[ext=m4a]" --merge-output-format "mp4" --output "${downloadsPath}NoHotMILFs - '${title}'.${fileType}" --postprocessor-args "${postprocessorArgs}" --ffmpeg-location "${ffmpegPath}"`
+    const ydl = spawn(`cd ${OSAssetsDirPath} && ${ytdlpBinaryName} ${ytdlpArgs} "${url}"`, {
+        shell: true
     });
 
     // Count number of downloads (First is video, then audio)
-    let downloadCount = 0;
+    let downloadCount;
+    if (fileType === 'mp4') {
+        downloadCount = 0;
+    } else {
+        downloadCount = 1;
+    }
+
     const loadingIcon = document.createElement('div');
     loadingIcon.className = 'loading-icon';
-    // received a message sent from the Python script (a simple "print" statement)s
-    pyshell.on('message', function (message) {
-        message = message.split('{')[0];
-        message = message.split(']')[1];
-        const progressPercentage = message.split('%')[0].trim();
+
+    ydl.stderr.on('data', (data) => {
+        console.warn(`stderr: ${data}`);
+    });
+
+    ydl.stdout.on('data', (data) => {
+        // Parsing data
+        data = data.toString();
+
+        // return if data object is empty or the data is not of use
+        // yt-dlp sometimes sends empty data object for some reason
+        if (data === undefined || !(data.charAt(data.length - 3) === ':')) {
+            return
+        }
+
+        data = data.split(']')[1].trim();
+
+        // Parsing progress percentage
+        const progressPercentage = data.split('%')[0]
         if (progressPercentage === '100.0') {
             downloadCount += 1;
         }
 
         if (downloadCount === 0) {
             document.querySelector('#current-download p').innerHTML =
-                `Downloading Video&nbsp;&nbsp;—&nbsp;&nbsp;${message.substring(0, message.length - 9)}&nbsp;&nbsp;—&nbsp;&nbsp;${message.substring(message.length - 9)}`;
+                    `Downloading Video&nbsp;&nbsp;—&nbsp;&nbsp;${data.substring(0, data.length - 9)}&nbsp;&nbsp;—&nbsp;&nbsp;${data.substring(data.length - 9)}`;
         } else if (downloadCount === 1) {
             document.querySelector('#current-download p').innerHTML =
-                `Downloading Audio&nbsp;&nbsp;—&nbsp;&nbsp;${message.substring(0, message.length - 9)}&nbsp;&nbsp;—&nbsp;&nbsp;${message.substring(message.length - 9)}`;
+                    `Downloading Audio&nbsp;&nbsp;—&nbsp;&nbsp;${data.substring(0, data.length - 9)}&nbsp;&nbsp;—&nbsp;&nbsp;${data.substring(data.length - 9)}`;
         } else {
             document.querySelector('#current-download p').innerHTML = 'Exporting download...';
             progressBarContainer.remove();
@@ -296,13 +373,8 @@ function downloadVideo(url, title, formatId, fileType, fileSize) {
         progressBar.style.width = progressPercentage + '%';
     });
 
-    // end the input stream and allow the process to exit
-    pyshell.end(function (err,code,signal) {
-        if (err) throw err;
-        console.log('The exit code was: ' + code);
-        console.log('The exit signal was: ' + signal);
-        console.log('finished');
-
+    ydl.on('close', (code) => {
+        console.log(`yt-dlp process exited with code ${code}`)
         currentDownloadSection.remove();
         loadingIcon.remove();
 

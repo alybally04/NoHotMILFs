@@ -14,17 +14,23 @@
       <li id="Uz">
         <p>Todo:</p>
         <ul>
-          <li id="dv">
-            <p>1. Finish creating welcome page, include detail on features and how to use</p>
-          </li>
-          <li id="jT">
-            <p>2. Create UI including loading progress bar, estimated download time remaining and download speed.</p>
+          <li id="9ES">
+            <p>Finish creating welcome page</p>
           </li>
           <li id="fs">
-            <p>3. Add a settings page, include the ability to change the downloads path</p>
+            <p>Add a settings page, include the ability to change the downloads path</p>
           </li>
           <li id="7z">
-            <p>4. Add a help page with detailed info about use of program</p>
+            <p>Add a help page with detailed info about use of program</p>
+          </li>
+          <li id="CPs">
+            <p>Write a ReadMe document</p>
+          </li>
+          <li id="-In">
+            <p>Remove all use of python in app, lookup and download videos in node using yt-dlp binaries via command line</p>
+          </li>
+          <li id="XN">
+            <p/>
           </li>
         </ul>
       </li>

@@ -84,7 +84,6 @@ if (commandLineArguments.includes('--squirrel-firstrun')) {
   }
 }
 
-// TODO: remove old userData.json from appdatadir on install 
 // On MacOS process.env.APPDATA returns undefined, which is a falsy value (is equivalent to "false")
 const appDataDir = process.env.APPDATA ? process.env.APPDATA + '\\NoHotMILFs\\' : process.env.HOME + '/Library/Preferences/NoHotMILFs/'
 if (fs.existsSync(appDataDir) === false) {
@@ -105,7 +104,6 @@ ipcMain.on ("disableWelcome", (event) => {
   });
 });
 
-
 let mainWindow;
 const createMainWindow = () => {
   mainWindow = new BrowserWindow({
@@ -122,6 +120,12 @@ const createMainWindow = () => {
 
   mainWindow.removeMenu();
   mainWindow.loadFile('pages/index.html')
+
+  // Sending app's main directory to main page renderer once the main page has loaded
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('appDir', app.getAppPath());
+  })
+
   mainWindow.webContents.openDevTools();
 
   return mainWindow
