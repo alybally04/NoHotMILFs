@@ -28,7 +28,7 @@ ipcRenderer.on('appDir', function (evt, message) {
     if (process.platform === 'win32') {
         OSAssetsDirPath = appDir + '\\assets\\Win';
         ytdlpBinaryName = 'yt-dlp.exe';
-        ffmpegPath = appDir + '\\assets\\Win\\ffmpeg\\bin';
+        ffmpegPath = appDir + '\\assets\\Win\\ffmpeg';
         downloadsPath = '%USERPROFILE%\\Downloads\\';
         postprocessorArgs = '';
     } else {
