@@ -109,7 +109,7 @@ function lookupVideo () {
     disableInputs(true);
 
     // Removing previous video info and formats table sections and creating new ones
-    const elementsToRemove = ['#video-details', '#success-message', '#formats-table', '#current-download']
+    const elementsToRemove = ['#start-message', '#video-details', '#success-message', '#formats-table', '#current-download']
     for (let i = 0; i < elementsToRemove.length; i++) {
         const currentElement = document.querySelector(elementsToRemove[i])
         if (currentElement !== null) {

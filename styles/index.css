@@ -72,7 +72,14 @@ input[type=button]:active {
 }
 
 #start-message {
-  
+  width: max-content;
+  background-color: #eaeaea;
+  margin: 0 auto;
+}
+
+#start-message p {
+  padding: 20px 20px;
+  font-size: 1.075rem;
 }
 
 .loading-icon {

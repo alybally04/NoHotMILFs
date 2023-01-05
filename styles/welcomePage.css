@@ -1,11 +1,12 @@
 body {
   background-color: #00FFFE;
   font-weight: bolder;
-  font-size: 1.1rem;
+  font-size: 1.025rem;
+  padding: 10px 25px;
 }
 
 div {
-  margin-top: 50px;
+  margin-top: 20px;
 }
 
 a {
@@ -14,7 +15,7 @@ a {
   color: white;
   background-color: black;
   border-radius: 0.4rem;
-  margin: 80px 8px;
+  margin: 8px 8px;
   padding: 10px 8px;
 }
 
@@ -24,12 +25,12 @@ object {
   height: 25px;
   border-radius: 25%;
   padding: 3px;
-  top: 0.45em;
+  top: 0.40em;
   position: relative;
 }
 
 #dismiss-window {
-  margin-top: 25px;
+  margin-top: 15px;
   padding: 8px 20px;
   font-size: 1.1em;
   color: white;
