@@ -177,7 +177,6 @@ function lookupVideo () {
 
             const videoTitle = document.createElement('h3');
             videoTitle.innerText = titleText;
-            videoTitle.style.padding = null; // Remove error message styling if applied
 
             const infoText = document.createElement('p')
             // time_readable(infoJson['duration']) date_readable(infoJson['upload_date']) infoJson['webpage_url']

@@ -71,6 +71,10 @@ input[type=button]:active {
   pointer-events: none;
 }
 
+#start-message {
+  
+}
+
 .loading-icon {
   border: 12px solid #f3f3f3;
   border-radius: 50%;
