@@ -1,8 +1,6 @@
 if (require('electron-squirrel-startup')) return;
 const { app, shell, BrowserWindow, ipcMain } = require('electron');
 const fs = require('fs')
-const commandLineArguments = process.argv;
-
 
 // this should be placed at top of main.js to handle setup events quickly
 if (handleSquirrelEvent()) {
@@ -72,38 +70,24 @@ function handleSquirrelEvent() {
   }
 }
 
-if (commandLineArguments.includes('--squirrel-firstrun')) {
-  if (process.platform === 'win32') {
-    if (fs.existsSync(process.env.APPDATA + '\\NoHotMILFs')) {
-      fs.rmSync(process.env.APPDATA + '\\NoHotMILFs', {recursive: true, force: true});
-    }
-  } else {
-    if (fs.existsSync(process.env.HOME + '/Library/Preferences/NoHotMILFs')) {
-      fs.rmSync(process.env.HOME + '/Library/Preferences/NoHotMILFs', {recursive: true, force: true});
-    }
-  }
-}
-
 // On MacOS process.env.APPDATA returns undefined, which is a falsy value (is equivalent to "false")
 const appDataDir = process.env.APPDATA ? process.env.APPDATA + '\\NoHotMILFs\\' : process.env.HOME + '/Library/Preferences/NoHotMILFs/'
 if (fs.existsSync(appDataDir) === false) {
   fs.mkdirSync(appDataDir);
 }
 
-
 ipcMain.on ("disableWelcome", (event) => {
-  fs.readFile(appDataDir + 'userData.json', (err, data) => {
+  fs.readFile(appDataDir + 'appConfig.json', (err, data) => {
     if (err) throw err;
 
-    let userData = JSON.parse(data);
-    userData.welcomeDisabled = true;
+    let appConfig = JSON.parse(data);
+    appConfig.welcomeDisabled = true;
 
-    fs.writeFile(appDataDir + 'userData.json', JSON.stringify(userData), (err) => {
+    fs.writeFile(appDataDir + 'appConfig.json', JSON.stringify(appConfig), (err) => {
       if (err) throw err;
     });
   });
 });
-
 
 const createMainWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -132,7 +116,6 @@ const createMainWindow = () => {
   return mainWindow
 }
 
-
 // Create welcome window as a child of the main window
 const createWelcomeWindow = () => {
   const welcomeWindow = new BrowserWindow({
@@ -158,19 +141,27 @@ const createWelcomeWindow = () => {
   return welcomeWindow
 }
 
-
 app.whenReady().then(() => {
-  let userData;
-  if (fs.existsSync(appDataDir + 'userData.json')) {
-    userData = JSON.parse(fs.readFileSync(appDataDir + 'userData.json', 'utf8'));
+  let appConfig;
+  if (!fs.existsSync(appDataDir + 'appConfig.json')) { // If no appConfig file exists
+    appConfig = {version: app.getVersion(), welcomeDisabled: false};
+    fs.writeFileSync(appDataDir + 'appConfig.json', JSON.stringify(appConfig));
+
   } else {
-    userData = {welcomeDisabled: false};
-    fs.writeFileSync(appDataDir + 'userData.json', JSON.stringify(userData));
+    appConfig = JSON.parse(fs.readFileSync(appDataDir + 'appConfig.json', 'utf8'));
+
+    // If app is updated to newer version
+    if (appConfig.version !== app.getVersion()) {
+      appConfig.version = app.getVersion();
+      appConfig.welcomeDisabled = false; // Welcome page should be shown again
+
+      fs.writeFileSync(appDataDir + 'appConfig.json', JSON.stringify(appConfig));
+    }
   }
 
   const mainWindow = createMainWindow();
 
-  if (userData.welcomeDisabled === false) {
+  if (appConfig.welcomeDisabled === false) {
     mainWindow.setEnabled(false)
     const welcomeWindow = createWelcomeWindow();
 
@@ -190,7 +181,6 @@ app.whenReady().then(() => {
     }
   });
 });
-
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
