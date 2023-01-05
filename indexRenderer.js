@@ -143,6 +143,7 @@ function lookupVideo () {
             // Generating video information section
             const videoTitle = document.createElement('h3');
             videoTitle.innerText = 'An error has occurred!';
+            videoTitle.style.padding = '20px 0 8px'; // Change formatting for error message
 
             const infoText = document.createElement('p');
             infoText.innerText = 'Please ensure the URL was entered correctly and try again';
@@ -163,7 +164,7 @@ function lookupVideo () {
             main.appendChild(videoInfoSection);
 
         } else {
-            // Parsing video data json returned from yt-dlp
+            // Parsed video data json returned from yt-dlp
             const infoJson = JSON.parse(stdout)
 
             // Generating video information section
@@ -176,12 +177,23 @@ function lookupVideo () {
 
             const videoTitle = document.createElement('h3');
             videoTitle.innerText = titleText;
+            videoTitle.style.padding = null; // Remove error message styling if applied
 
             const infoText = document.createElement('p')
             // time_readable(infoJson['duration']) date_readable(infoJson['upload_date']) infoJson['webpage_url']
-            infoText.innerHTML = `Length: ${timeReadable(infoJson['duration'])}<br>Channel: ${infoJson['uploader']}<br>Uploaded on: ${dateReadable(infoJson['upload_date'])}`;
+
+            // Truncate channel name if too long for container (max width that fits is 30 chars)
+            let channelName;
+            if (infoJson['uploader'].length > 30) {
+                channelName = infoJson['uploader'].substring(0, 21) + '...';
+            } else {
+                channelName = infoJson['uploader'];
+            }
+
+            infoText.innerHTML = `Length: ${timeReadable(infoJson['duration'])}<br>Channel: ${channelName}<br>Uploaded on: ${dateReadable(infoJson['upload_date'])}`;
 
             const videoThumbnail = document.createElement('img');
+            // noinspection JSValidateTypes
             videoThumbnail.src = infoJson['thumbnail'];
             videoThumbnail.alt = "Youtube video thumbnail";
 

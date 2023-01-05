@@ -35,7 +35,7 @@ input[type=button]:active {
 
 #url-input label {
   background-color: #00FFFE;
-  padding: 2.7vh 1vh 2.8vh 1vh;
+  padding: 24px 8px 26px;
   font-weight: bold;
   font-size: 115%;
   border-radius: 0.4rem;
@@ -43,8 +43,9 @@ input[type=button]:active {
 
 #input-field {
   width: 50vw;
-  padding: 2vh 1vw;
-  line-height: 2.4vh;
+  max-width: 900px;
+  padding: 16px 9px;
+  line-height: 25px;
   font-size: large;
   border: none;
 }
@@ -107,12 +108,14 @@ input[type=button]:active {
 }
 
 #video-details div > div {
+  height: 150px;
   margin-left: 42.5%;
 }
 
 #video-details h3 {
-  margin: 8px 0 12px;
-  height: 45px;
+  height: 50px;
+  margin: 0;
+  padding: 8px 0 8px;
 }
 
 #video-details p {
