@@ -5,14 +5,14 @@ module.exports = {
   },
   rebuildConfig: {},
   makers: [
-    /*{
+    {
       name: '@electron-forge/maker-squirrel',
       config: {
         authors: 'Evelyn Jones',
         description: 'A Program for downloading YouTube videos',
         iconUrl: __dirname + '/assets/icons/icon',
       },
-    },*/
+    },
     {
       name: '@electron-forge/maker-zip',
       platforms: ['darwin', 'win32'],

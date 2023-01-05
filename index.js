@@ -104,9 +104,9 @@ ipcMain.on ("disableWelcome", (event) => {
   });
 });
 
-let mainWindow;
+
 const createMainWindow = () => {
-  mainWindow = new BrowserWindow({
+  const mainWindow = new BrowserWindow({
     width: 1000,
     height: 800,
     minWidth: 800,
@@ -126,6 +126,7 @@ const createMainWindow = () => {
     mainWindow.webContents.send('appDir', app.getAppPath());
   })
 
+  // TODO: remove dev tools opening before building distributable
   mainWindow.webContents.openDevTools();
 
   return mainWindow
@@ -153,7 +154,6 @@ const createWelcomeWindow = () => {
 
   welcomeWindow.removeMenu();
   welcomeWindow.loadFile('pages/welcomePage.html');
-  mainWindow.webContents.openDevTools();
 
   return welcomeWindow
 }

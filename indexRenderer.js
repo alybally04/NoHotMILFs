@@ -118,7 +118,9 @@ function lookupVideo () {
     }
 
     const videoInfoSection = document.createElement('section');
+    const videoInfoDiv = document.createElement('div');
     videoInfoSection.id = 'video-details';
+
 
     const formatsTableSection = document.createElement('section');
     formatsTableSection.id = 'formats-table';
@@ -142,21 +144,22 @@ function lookupVideo () {
             const videoTitle = document.createElement('h3');
             videoTitle.innerText = 'An error has occurred!';
 
-            const infoText = document.createElement('p')
+            const infoText = document.createElement('p');
             infoText.innerText = 'Please ensure the URL was entered correctly and try again';
 
             const videoThumbnail = document.createElement('img');
             videoThumbnail.src = '../assets/images/imageUnavailable.png';
-            videoThumbnail.alt = "Youtube video thumbnail"
+            videoThumbnail.alt = "Youtube video thumbnail";
 
-            const infoDiv = document.createElement('div')
-            infoDiv.appendChild(videoTitle)
-            infoDiv.appendChild(infoText)
+            const infoDiv = document.createElement('div');
+            infoDiv.appendChild(videoTitle);
+            infoDiv.appendChild(infoText);
 
-            videoInfoSection.appendChild(videoThumbnail)
-            videoInfoSection.appendChild(infoDiv)
+            videoInfoDiv.appendChild(videoThumbnail);
+            videoInfoDiv.appendChild(infoDiv);
 
             const main = document.querySelector('main');
+            videoInfoSection.appendChild(videoInfoDiv);
             main.appendChild(videoInfoSection);
 
         } else {
@@ -180,14 +183,14 @@ function lookupVideo () {
 
             const videoThumbnail = document.createElement('img');
             videoThumbnail.src = infoJson['thumbnail'];
-            videoThumbnail.alt = "Youtube video thumbnail"
+            videoThumbnail.alt = "Youtube video thumbnail";
 
-            const infoDiv = document.createElement('div')
-            infoDiv.appendChild(videoTitle)
-            infoDiv.appendChild(infoText)
+            const infoDiv = document.createElement('div');
+            infoDiv.appendChild(videoTitle);
+            infoDiv.appendChild(infoText);
 
-            videoInfoSection.appendChild(videoThumbnail)
-            videoInfoSection.appendChild(infoDiv)
+            videoInfoDiv.appendChild(videoThumbnail);
+            videoInfoDiv.appendChild(infoDiv);
 
             // Generating formats table
             const table = document.createElement("table");
@@ -213,7 +216,7 @@ function lookupVideo () {
             const cell4 = document.createElement('th');
             row.appendChild(cell4);
 
-            tableHead.appendChild(row)
+            tableHead.appendChild(row);
 
             // Generating tableBody
             let audioFileSize = 0;
@@ -274,6 +277,7 @@ function lookupVideo () {
             formatsTableSection.appendChild(table);
 
             // Adding video-info and formats-table to UI
+            videoInfoSection.appendChild(videoInfoDiv);
             main.appendChild(videoInfoSection);
             main.appendChild(formatsTableSection);
         }

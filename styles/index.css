@@ -87,10 +87,12 @@ input[type=button]:active {
 }
 
 #video-details {
+  background-color: #eaeaea;
+}
+
+#video-details > div {
   will-change: transform;
   padding: 30px;
-  background-color: #f2f2f2;
-  border: black 5px solid;
   border-radius: 0.4rem;
   height: 150px;
   width: 700px;
@@ -104,8 +106,8 @@ input[type=button]:active {
   left: 30px;
 }
 
-#video-details div {
-  margin-left: 40%;
+#video-details div > div {
+  margin-left: 42.5%;
 }
 
 #video-details h3 {
@@ -114,12 +116,12 @@ input[type=button]:active {
 }
 
 #video-details p {
-  background-color: #cbcbcb;
-  line-height: 1.25em;
+  line-height: 1.5em;
+  text-decoration: underline black;
   overflow-wrap: break-word;
   max-width: max-content;
   margin: 0 auto;
-  padding: 8px 24px;
+  padding: 0 24px;
   border-radius: 0.4rem;
 }
 

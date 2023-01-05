@@ -1,5 +1,10 @@
+@font-face {
+  font-family: "primary";
+  src: url("../assets/fonts/HelveticaNeue.ttf");
+}
+
 body {
-  font-family: "SF Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  font-family: "primary", serif;
   text-align: center;
   margin: 0;
 }
